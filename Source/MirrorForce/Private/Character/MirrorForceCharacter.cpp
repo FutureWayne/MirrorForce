@@ -82,4 +82,6 @@ void AMirrorForceCharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	InitAbilityActorInfo();
+
+	AddCharacterAbilities();
 }

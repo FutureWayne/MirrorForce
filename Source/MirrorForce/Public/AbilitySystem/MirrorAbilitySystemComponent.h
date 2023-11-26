@@ -13,5 +13,7 @@ UCLASS()
 class MIRRORFORCE_API UMirrorAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
-	
+
+public:
+	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 };
