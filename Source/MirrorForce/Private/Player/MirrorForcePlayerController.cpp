@@ -1,12 +1,15 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Player/MirrorForcePlayerController.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "GameFramework/Pawn.h"
 #include "Engine/World.h"
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "GameplayTagContainer.h"
+#include "AbilitySystem/MirrorAbilitySystemComponent.h"
 #include "Input/MirrorEnhancedInputComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -73,13 +76,31 @@ void AMirrorForcePlayerController::Move(const FInputActionValue& Value)
 
 void AMirrorForcePlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("AbilityInputTagPressed: %s"), *InputTag.ToString()));
 }
 
 void AMirrorForcePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
+	if (GetMirrorAbilitySystemComponent() != nullptr)
+	{
+		GetMirrorAbilitySystemComponent()->AbilityInputTagReleased(InputTag);
+	}
 }
 
 void AMirrorForcePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
+	if (GetMirrorAbilitySystemComponent() != nullptr)
+	{
+		GetMirrorAbilitySystemComponent()->AbilityInputTagHeld(InputTag);
+	}
+}
+
+UMirrorAbilitySystemComponent* AMirrorForcePlayerController::GetMirrorAbilitySystemComponent()
+{
+	if (MirrorAbilitySystemComponent == nullptr)
+	{
+		MirrorAbilitySystemComponent = Cast<UMirrorAbilitySystemComponent>(
+			UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+	}
+
+	return MirrorAbilitySystemComponent;
 }
