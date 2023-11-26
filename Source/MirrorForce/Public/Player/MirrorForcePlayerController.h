@@ -8,8 +8,8 @@
 #include "GameFramework/PlayerController.h"
 #include "MirrorForcePlayerController.generated.h"
 
-/** Forward declaration to improve compiling times */
-class UNiagaraSystem;
+struct FGameplayTag;
+class UMirrorForceInputConfig;
 class UInputMappingContext;
 class UInputAction;
 
@@ -27,7 +27,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 	
-	/** Jump Input Action */
+	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> MoveAction;
 
@@ -38,6 +38,14 @@ protected:
 	virtual void BeginPlay() override;
 	
 	void Move(const FInputActionValue& Value);
+
+private:
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	TObjectPtr<UMirrorForceInputConfig> InputConfig;
 };
 
 

@@ -3,10 +3,11 @@
 #include "Player/MirrorForcePlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "Engine/World.h"
-#include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
+#include "GameplayTagContainer.h"
+#include "Input/MirrorEnhancedInputComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -32,10 +33,13 @@ void AMirrorForcePlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 	
 	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent)) {
+	if (UMirrorEnhancedInputComponent* MirrorEnhancedInputComponent = Cast<UMirrorEnhancedInputComponent>(InputComponent)) {
 
 		// Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMirrorForcePlayerController::Move);
+		MirrorEnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMirrorForcePlayerController::Move);
+
+		// Ability Input Actions
+		MirrorEnhancedInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 	}
 	else
 	{
@@ -65,4 +69,17 @@ void AMirrorForcePlayerController::Move(const FInputActionValue& Value)
 		ControlledPawn->AddMovementInput(ForwardDirection, MovementVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, MovementVector.X);
 	}
+}
+
+void AMirrorForcePlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("AbilityInputTagPressed: %s"), *InputTag.ToString()));
+}
+
+void AMirrorForcePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+}
+
+void AMirrorForcePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+{
 }
