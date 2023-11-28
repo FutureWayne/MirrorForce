@@ -22,7 +22,7 @@ void UMirrorForceBulletPattern::SpawnCirclePattern(UMirrorForceBulletPool* Bulle
 			Bullet->SetActorLocation(StartLocation);
 			float Angle = i * AngleBetweenBullets;
 			FVector Direction = FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.f);
-			Bullet->ProjectileMovementComponent->Velocity = Direction * BulletSpeed;
+			Bullet->ProjectileMovement->Velocity = Direction * BulletSpeed;
 		}
 	}
 }
@@ -57,7 +57,7 @@ void UMirrorForceBulletPattern::SpawnBullet(UMirrorForceBulletPool* BulletPool, 
 	{
 		Bullet->SetActorLocation(StartLocation);
 		FVector Direction = FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.f);
-		Bullet->ProjectileMovementComponent->Velocity = Direction * BulletSpeed;
+		Bullet->ProjectileMovement->Velocity = Direction * BulletSpeed;
 	}
 }
 

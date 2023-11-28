@@ -5,13 +5,6 @@
 
 AMirrorForcePooledBullet::AMirrorForcePooledBullet()
 {
-	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
-	ProjectileMovementComponent->UpdatedComponent = RootComponent;
-	ProjectileMovementComponent->InitialSpeed = 1000.f;
-	ProjectileMovementComponent->MaxSpeed = 2000.f;
-	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
-	ProjectileMovementComponent->bRotationFollowsVelocity = true;
-	ProjectileMovementComponent->bShouldBounce = true;
 }
 
 void AMirrorForcePooledBullet::SetActive(bool IsActive)
