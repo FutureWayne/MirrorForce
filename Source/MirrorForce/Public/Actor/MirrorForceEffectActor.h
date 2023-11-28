@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GameplayEffectTypes.h"
-#include "MirrorForceBulletBase.generated.h"
+#include "MirrorForceEffectActor.generated.h"
 
 class UGameplayEffect;
 class UAbilitySystemComponent;
@@ -26,13 +26,13 @@ enum class EEffectRemovalPolicy
 };
 
 UCLASS()
-class MIRRORFORCE_API AMirrorForceBulletBase : public AActor
+class MIRRORFORCE_API AMirrorForceEffectActor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AMirrorForceBulletBase();
+	AMirrorForceEffectActor();
 
 
 protected:
