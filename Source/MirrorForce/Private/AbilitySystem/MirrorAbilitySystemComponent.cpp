@@ -26,7 +26,7 @@ void UMirrorAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& 
 
 	for	(FGameplayAbilitySpec& Spec : GetActivatableAbilities())
 	{
-		if (Spec.DynamicAbilityTags.HasTagExact(InputTag))
+		if (Spec.DynamicAbilityTags.HasTagExact(InputTag) && Spec.IsActive())
 		{
 			AbilitySpecInputReleased(Spec);
 		}
