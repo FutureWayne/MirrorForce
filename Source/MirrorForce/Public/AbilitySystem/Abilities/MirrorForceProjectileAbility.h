@@ -23,4 +23,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MirrorForce|Projectile")
 	TSubclassOf<AMirrorForceProjectile> ProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MirrorForce|Projectile")
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
 };

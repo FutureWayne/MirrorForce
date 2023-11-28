@@ -1,24 +1,24 @@
 // Copyright Mirror Force
 
-#include "Actor/MirrorForceBulletBase.h"
+#include "Actor/MirrorForceEffectActor.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 
 // Sets default values
-AMirrorForceBulletBase::AMirrorForceBulletBase()
+AMirrorForceEffectActor::AMirrorForceEffectActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>("SceneRoot"));
 }
 
-void AMirrorForceBulletBase::BeginPlay()
+void AMirrorForceEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void AMirrorForceBulletBase::ApplyEffectToTargetActor(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass)
+void AMirrorForceEffectActor::ApplyEffectToTargetActor(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass)
 {
 	if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor))
 	{
@@ -36,7 +36,7 @@ void AMirrorForceBulletBase::ApplyEffectToTargetActor(AActor* TargetActor, TSubc
 	}
 }
 
-void AMirrorForceBulletBase::OnOverlap(AActor* TargetActor)
+void AMirrorForceEffectActor::OnOverlap(AActor* TargetActor)
 {
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap && InstantGameplayEffectClass)
 	{
@@ -54,7 +54,7 @@ void AMirrorForceBulletBase::OnOverlap(AActor* TargetActor)
 	}
 }
 
-void AMirrorForceBulletBase::OnEndOverlap(AActor* TargetActor)
+void AMirrorForceEffectActor::OnEndOverlap(AActor* TargetActor)
 {
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap && InstantGameplayEffectClass)
 	{
