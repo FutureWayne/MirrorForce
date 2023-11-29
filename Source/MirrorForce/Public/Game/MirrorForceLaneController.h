@@ -4,16 +4,31 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "MirrorForceLaneScroller.generated.h"
+#include "MirrorForceLaneController.generated.h"
+
+USTRUCT(BlueprintType)
+struct FLaneInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")
+	AActor* LaneActor = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")
+	AActor* Waypoint = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")
+	ACameraActor* Camera = nullptr;
+};
 
 UCLASS()
-class MIRRORFORCE_API AMirrorForceLaneScroller : public AActor
+class MIRRORFORCE_API AMirrorForceLaneController : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AMirrorForceLaneScroller();
+	AMirrorForceLaneController();
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -29,17 +44,10 @@ protected:
 	float LaneScrollSpeed = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")
-	AActor* LaneActor1 = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")
-	AActor* LaneActor2 = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")
-  	AActor* LaneActor3 = nullptr;
+	TArray<FLaneInfo> Lanes = {};
 
 private:
-	UPROPERTY()
-	TArray<AActor*> LaneActors = {};
-	
 	int CurrentLaneIndex = 0;
+
+	TArray<FVector> AnchorPointLocations = {};
 };
