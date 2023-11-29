@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectTypes.h"
+#include "ActorPool/MirrorForcePooledActor.h"
 #include "GameFramework/Actor.h"
 #include "MirrorForceProjectile.generated.h"
 
@@ -13,7 +14,7 @@ class USphereComponent;
 class UProjectileMovementComponent;
 
 UCLASS()
-class MIRRORFORCE_API AMirrorForceProjectile : public AActor
+class MIRRORFORCE_API AMirrorForceProjectile : public AMirrorForcePooledActor
 {
 	GENERATED_BODY()
 	
