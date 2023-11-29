@@ -71,11 +71,7 @@ AMirrorForcePooledActor* UMirrorForceActorPool::SpawnPooledActor()
 	return nullptr;
 }
 
-
 void UMirrorForceActorPool::OnPooledActorDespawn(AMirrorForcePooledActor* PooledActor)
 {
 	SpawnedPoolIndexes.Remove(PooledActor->GetPoolIndex());
 }
-
-
-

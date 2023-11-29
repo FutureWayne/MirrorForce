@@ -43,6 +43,14 @@ void AMirrorForceLaneScroller::Tick(float DeltaTime)
 
 void AMirrorForceLaneScroller::ChangeToNextScrollingLane()
 {
+	AActor* LastLane = LaneActors[CurrentLaneIndex];
+	FVector LastLaneLocation = LastLane->GetActorLocation();
+	LastLaneLocation.Y = 5000.f;
+	LastLane->SetActorLocation(LastLaneLocation);
 	CurrentLaneIndex = (CurrentLaneIndex + 1) % LaneActors.Num();
+	AActor* CurrentLane = LaneActors[CurrentLaneIndex];
+	FVector CurrentLaneLocation = CurrentLane->GetActorLocation();
+	CurrentLaneLocation.Y = 0.f;
+	CurrentLane->SetActorLocation(CurrentLaneLocation);
 }
 
