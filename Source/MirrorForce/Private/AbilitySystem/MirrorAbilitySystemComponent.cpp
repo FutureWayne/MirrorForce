@@ -28,11 +28,8 @@ void UMirrorAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& I
 	{
 		if (Spec.DynamicAbilityTags.HasTagExact(InputTag))
 		{
+			TryActivateAbility(Spec.Handle);
 			AbilitySpecInputPressed(Spec);
-			if (!Spec.IsActive())
-			{
-				TryActivateAbility(Spec.Handle);
-			}
 		}
 	}
 }

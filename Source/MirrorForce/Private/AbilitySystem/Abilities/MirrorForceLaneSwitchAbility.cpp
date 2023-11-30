@@ -11,8 +11,6 @@ void UMirrorForceLaneSwitchAbility::InputPressed(const FGameplayAbilitySpecHandl
 {
 	Super::InputPressed(Handle, ActorInfo, ActivationInfo);
 
-	ActivateAbility(Handle, ActorInfo, ActivationInfo, nullptr);
-
 	if (const AMirrorForceGameModeBase* GameMode = Cast<AMirrorForceGameModeBase>(GetWorld()->GetAuthGameMode()))
 	{
 		AMirrorForceLaneController* LaneController = GameMode->LaneController;

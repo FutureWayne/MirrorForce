@@ -25,7 +25,7 @@ void AMirrorForceLaneController::BeginPlay()
 		FBox BoundingBox = MeshComponent->CalcBounds(MeshComponent->GetComponentTransform()).GetBox();
 		FVector CenterLocation = BoundingBox.GetCenter();
 		CenterLocation.X -= 1000.f;
-		CenterLocation.Z += 500.f;
+		CenterLocation.Z += 2000.f;
 		AnchorPointLocations.Add(CenterLocation);
 		
 		LaneInfo.Camera->SetActorLocation(CenterLocation);
