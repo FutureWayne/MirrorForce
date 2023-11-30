@@ -38,7 +38,7 @@ void AMirrorForceBulletSpawner::SpawnMultipleCircles(int NumBullets, float Angle
 		{
 			FTimerHandle TimerHandle;
 			FTimerDelegate TimerDel;
-			TimerDel.BindUFunction(this, FName("SpawnCirclePattern"), BulletPool, NumBullets, AngleBetweenBullets, BulletSpeed);
+			TimerDel.BindUFunction(this, FName("SpawnCirclePattern"), NumBullets, AngleBetweenBullets, BulletSpeed);
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, i * DelayBetweenSpirals, false);
 		}
 		else
@@ -56,7 +56,7 @@ void AMirrorForceBulletSpawner::SpawnSpiralPattern(int NumBullets, float AngleIn
 		FTimerDelegate TimerDel;
 		if (DelayBetweenBullets > 0.f)
 		{
-			TimerDel.BindUFunction(this, FName("SpawnBullet"), BulletPool, i * AngleIncrement, BulletSpeed);
+			TimerDel.BindUFunction(this, FName("SpawnBullet"), i * AngleIncrement, BulletSpeed);
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, i * DelayBetweenBullets, false);
 		}
 		else

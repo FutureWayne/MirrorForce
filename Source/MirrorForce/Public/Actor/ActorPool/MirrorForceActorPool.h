@@ -6,7 +6,6 @@
 #include "Actor/ActorPool/MirrorForcePooledActor.h"
 #include "MirrorForceActorPool.generated.h"
 
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MIRRORFORCE_API UMirrorForceActorPool : public UActorComponent
 {
