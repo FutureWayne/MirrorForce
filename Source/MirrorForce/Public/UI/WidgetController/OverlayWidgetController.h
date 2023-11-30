@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/MirrorAttributeSet.h"
 #include "UI/WidgetController/MirrorForceWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
@@ -28,9 +27,4 @@ public:
 	virtual void BroadcastInitialValues() override;
 
 	virtual void BindCallbacksToDependencies() override;
-
-protected:
-	void HealthChangedCallback(const FOnAttributeChangeData& Data) const;
-	void MaxHealthChangedCallback(const FOnAttributeChangeData& Data) const;
-	
 };

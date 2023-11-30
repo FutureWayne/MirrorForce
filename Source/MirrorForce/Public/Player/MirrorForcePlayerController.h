@@ -8,10 +8,11 @@
 #include "GameFramework/PlayerController.h"
 #include "MirrorForcePlayerController.generated.h"
 
-/** Forward declaration to improve compiling times */
-class UNiagaraSystem;
+struct FGameplayTag;
+class UMirrorForceInputConfig;
 class UInputMappingContext;
 class UInputAction;
+class UMirrorAbilitySystemComponent;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -23,14 +24,6 @@ class AMirrorForcePlayerController : public APlayerController
 public:
 	AMirrorForcePlayerController();
 
-	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	TObjectPtr<UInputMappingContext> DefaultMappingContext;
-	
-	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	TObjectPtr<UInputAction> MoveAction;
-
 protected:
 	virtual void SetupInputComponent() override;
 	
@@ -38,6 +31,27 @@ protected:
 	virtual void BeginPlay() override;
 	
 	void Move(const FInputActionValue& Value);
+
+private:
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
+	
+	UMirrorAbilitySystemComponent* GetMirrorAbilitySystemComponent();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	TObjectPtr<UMirrorForceInputConfig> InputConfig;
+
+	/** MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	TObjectPtr<UInputMappingContext> DefaultMappingContext;
+	
+	/** Move Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> MoveAction;
+
+	UPROPERTY()
+	TObjectPtr<UMirrorAbilitySystemComponent> MirrorAbilitySystemComponent;
+
+
 };
-
-

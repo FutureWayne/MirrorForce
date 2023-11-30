@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "AbilitySystemInterface.h"
 #include "Character/MirrorForceCharacterBase.h"
 #include "MirrorForceCharacter.generated.h"
 

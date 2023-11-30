@@ -2,6 +2,7 @@
 
 
 #include "UI/WidgetController/OverlayWidgetController.h"
+#include "AbilitySystem/MirrorAttributeSet.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -16,18 +17,17 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 {
 	const UMirrorAttributeSet* MirrorAttributeSet = CastChecked<UMirrorAttributeSet>(AttributeSet);
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MirrorAttributeSet->GetHealthAttribute()).AddUObject(
-		this, &UOverlayWidgetController::HealthChangedCallback);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MirrorAttributeSet->GetMaxHealthAttribute()).AddUObject(
-	 	this, &UOverlayWidgetController::MaxHealthChangedCallback);
-}
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MirrorAttributeSet->GetHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnHealthChanged.Broadcast(Data.NewValue);
+		}
+	);
 
-void UOverlayWidgetController::HealthChangedCallback(const FOnAttributeChangeData& Data) const
-{
-	OnHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::MaxHealthChangedCallback(const FOnAttributeChangeData& Data) const
-{
-	OnMaxHealthChanged.Broadcast(Data.NewValue);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MirrorAttributeSet->GetMaxHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnMaxHealthChanged.Broadcast(Data.NewValue);
+		}
+	);
 }
