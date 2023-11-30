@@ -20,6 +20,23 @@ void UMirrorAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclass
 	}
 }
 
+void UMirrorAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
+{
+	if (!InputTag.IsValid()) return;
+
+	for	(FGameplayAbilitySpec& Spec : GetActivatableAbilities())
+	{
+		if (Spec.DynamicAbilityTags.HasTagExact(InputTag))
+		{
+			AbilitySpecInputPressed(Spec);
+			if (!Spec.IsActive())
+			{
+				TryActivateAbility(Spec.Handle);
+			}
+		}
+	}
+}
+
 void UMirrorAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& InputTag)
 {
 	if (!InputTag.IsValid()) return;
@@ -41,7 +58,6 @@ void UMirrorAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& Inpu
 	{
 		if (Spec.DynamicAbilityTags.HasTagExact(InputTag))
 		{
-			AbilitySpecInputPressed(Spec);
 			if (!Spec.IsActive())
 			{
 				TryActivateAbility(Spec.Handle);

@@ -27,17 +27,14 @@ class MIRRORFORCE_API AMirrorForceLaneController : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AMirrorForceLaneController();
 	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Lane Scroller")
 	void ChangeToNextScrollingLane();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")

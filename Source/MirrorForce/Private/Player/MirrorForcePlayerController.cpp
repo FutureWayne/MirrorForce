@@ -76,6 +76,10 @@ void AMirrorForcePlayerController::Move(const FInputActionValue& Value)
 
 void AMirrorForcePlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
+	if (GetMirrorAbilitySystemComponent() != nullptr)
+	{
+		GetMirrorAbilitySystemComponent()->AbilityInputTagPressed(InputTag);
+	}
 }
 
 void AMirrorForcePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
