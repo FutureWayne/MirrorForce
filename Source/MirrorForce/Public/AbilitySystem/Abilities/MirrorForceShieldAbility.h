@@ -21,10 +21,24 @@ protected:
 		const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
+
+	void OnManaChange(const FOnAttributeChangeData& OnAttributeChangeData);
 	
+	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MirrorForce|Shield")
 	TSubclassOf<AMirrorForceShield> ShieldClass;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MirrorForce|Shield")
+	TSubclassOf<UGameplayEffect> ManaCostEffectClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MirrorForce|Shield")
+	TSubclassOf<UGameplayEffect> ManaRegenEffectClass;
+	
 private:
 	TObjectPtr<AMirrorForceShield> SpawnedShield;
+
+	FActiveGameplayEffectHandle ManaCostEffectHandle;
+
+	FActiveGameplayEffectHandle ManaRegenEffectHandle;
 };
