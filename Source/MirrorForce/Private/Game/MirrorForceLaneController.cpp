@@ -51,7 +51,7 @@ void AMirrorForceLaneController::BeginPlay()
 	AquaticAudioComponent->SetPaused(true);
 	MoonAudioComponent->SetPaused(true);
 
-	CurrentAudioComponent = SpaceAudioComponent;
+	CurrentAudioComponent = AquaticAudioComponent;
 	CurrentAudioComponent->SetPaused(false);
 }
 
@@ -114,20 +114,20 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 	UGameplayStatics::PlaySoundAtLocation(this, SwitchLaneSFX, GetActorLocation());
 	switch (CurrentLaneIndex)
 	{
-		case 0: //Space
-			CurrentAudioComponent->SetPaused(true); 
-			SpaceAudioComponent->SetPaused(false);
-			CurrentAudioComponent = SpaceAudioComponent;
-			break;
-		case 1: //Aquatic
+		case 0: //Aquatic
 			CurrentAudioComponent->SetPaused(true);
 			AquaticAudioComponent->SetPaused(false);
 			CurrentAudioComponent = AquaticAudioComponent;
 			break;
-		case 2: //Moon
+		case 1: //Moon
 			CurrentAudioComponent->SetPaused(true);
 			MoonAudioComponent->SetPaused(false);
 			CurrentAudioComponent = MoonAudioComponent;
+			break;
+		case 2: //Space
+			CurrentAudioComponent->SetPaused(true); 
+			SpaceAudioComponent->SetPaused(false);
+			CurrentAudioComponent = SpaceAudioComponent;
 			break;
 	}
 }
