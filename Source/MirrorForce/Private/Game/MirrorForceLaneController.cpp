@@ -4,6 +4,8 @@
 #include "Game/MirrorForceLaneController.h"
 
 #include "Camera/CameraActor.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 AMirrorForceLaneController::AMirrorForceLaneController()
 {
@@ -40,6 +42,17 @@ void AMirrorForceLaneController::BeginPlay()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PlayerController is NULL"));
 	}
+
+	SpaceAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, SpaceMusic, GetActorLocation());
+	AquaticAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, AquaticMusic, GetActorLocation());
+	MoonAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, MoonMusic, GetActorLocation());
+
+	SpaceAudioComponent->SetPaused(true);
+	AquaticAudioComponent->SetPaused(true);
+	MoonAudioComponent->SetPaused(true);
+
+	CurrentAudioComponent = AquaticAudioComponent;
+	CurrentAudioComponent->SetPaused(false);
 }
 
 void AMirrorForceLaneController::Tick(float DeltaTime)
@@ -96,5 +109,26 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 	}
 
 	// TODO: Move Boss by delta location
+
+	//Switch lanes theme music
+	UGameplayStatics::PlaySoundAtLocation(this, SwitchLaneSFX, GetActorLocation());
+	switch (CurrentLaneIndex)
+	{
+		case 0: //Aquatic
+			CurrentAudioComponent->SetPaused(true);
+			AquaticAudioComponent->SetPaused(false);
+			CurrentAudioComponent = AquaticAudioComponent;
+			break;
+		case 1: //Moon
+			CurrentAudioComponent->SetPaused(true);
+			MoonAudioComponent->SetPaused(false);
+			CurrentAudioComponent = MoonAudioComponent;
+			break;
+		case 2: //Space
+			CurrentAudioComponent->SetPaused(true); 
+			SpaceAudioComponent->SetPaused(false);
+			CurrentAudioComponent = SpaceAudioComponent;
+			break;
+	}
 }
 

@@ -26,6 +26,10 @@ protected:
 	
 	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 
+	void ShieldOn();
+
+	void ShieldOff();
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MirrorForce|Shield")
 	TSubclassOf<AMirrorForceShield> ShieldClass;
 	
@@ -41,4 +45,16 @@ private:
 	FActiveGameplayEffectHandle ManaCostEffectHandle;
 
 	FActiveGameplayEffectHandle ManaRegenEffectHandle;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USoundBase> ShieldOnSFX;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USoundBase> ShieldOffSFX;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USoundBase> ShieldPersistSFX;
+
+	UPROPERTY()
+	UAudioComponent* ShieldPersistAudioComponent;
 };
