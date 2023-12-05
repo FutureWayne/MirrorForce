@@ -11,22 +11,16 @@ AMirrorForceBulletSpawner::AMirrorForceBulletSpawner()
 	PrimaryActorTick.bCanEverTick = false;
 
 	BulletPool = CreateDefaultSubobject<UMirrorForceActorPool>(TEXT("Bullet Pool"));
-}
+} 
 
+
+//CIRCLE
 void AMirrorForceBulletSpawner::SpawnCirclePattern(int NumBullets, float AngleBetweenBullets, float BulletSpeed)
 {
-	const FVector StartLocation = GetActorLocation();
-
 	for (int i = 0; i < NumBullets; i++)
 	{
-		AMirrorForceProjectile* Bullet = Cast<AMirrorForceProjectile>(BulletPool->SpawnPooledActor());
-		if (Bullet != nullptr)
-		{
-			Bullet->SetActorLocation(StartLocation);
-			const float Angle = i * AngleBetweenBullets;
-			FVector Direction = FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.f);
-			Bullet->ProjectileMovement->Velocity = Direction * BulletSpeed;
-		}
+		const float Angle = i * AngleBetweenBullets;
+		SpawnBullet(Angle, BulletSpeed);
 	}
 }
 
@@ -48,23 +42,34 @@ void AMirrorForceBulletSpawner::SpawnMultipleCircles(int NumBullets, float Angle
 	}
 }
 
+
+//SPIRAL
 void AMirrorForceBulletSpawner::SpawnSpiralPattern(int NumBullets, float AngleIncrement, float BulletSpeed, float DelayBetweenBullets)
 {
-	for (int i = 0; i < NumBullets; i++)
+	this->NumBullets = NumBullets;
+	this->AngleIncrement = AngleIncrement;
+	this->BulletSpeed = BulletSpeed;
+	this->CurrentBullet = 0;
+
+	FTimerHandle TimerHandle;
+	FTimerDelegate TimerDel;
+	TimerDel.BindUFunction(this, FName("SpawnBulletWithTimer"));
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, DelayBetweenBullets, true);
+}
+
+void AMirrorForceBulletSpawner::SpawnBulletWithTimer()
+{
+	if (CurrentBullet < NumBullets)
 	{
-		FTimerHandle TimerHandle;
-		FTimerDelegate TimerDel;
-		if (DelayBetweenBullets > 0.f)
-		{
-			TimerDel.BindUFunction(this, FName("SpawnBullet"), i * AngleIncrement, BulletSpeed);
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, i * DelayBetweenBullets, false);
-		}
-		else
-		{
-			SpawnBullet(i * AngleIncrement, BulletSpeed);
-		}
+		SpawnBullet(CurrentBullet * AngleIncrement, BulletSpeed);
+		CurrentBullet++;
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 	}
 }
+
 
 void AMirrorForceBulletSpawner::SpawnBullet(float Angle, float BulletSpeed) const
 {
@@ -77,4 +82,59 @@ void AMirrorForceBulletSpawner::SpawnBullet(float Angle, float BulletSpeed) cons
 	}
 }
 
+//HOMING
+void AMirrorForceBulletSpawner::SpawnHoveringPattern(int NumBullets, float DelayBetweenBullets, float BulletSpeed, AActor* Player)
+{
+	this->NumBullets = NumBullets;
+	this->CurrentBullet = 0;
+	this->Player = Player;
+	this->BulletSpeed = BulletSpeed;
 
+	FTimerDelegate TimerDel;
+	TimerDel.BindUFunction(this, FName("SpawnSingleHoveringBullet"));
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, TimerDel, DelayBetweenBullets, true);
+}
+
+void AMirrorForceBulletSpawner::SpawnSingleHoveringBullet()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Spawn."));
+	if (CurrentBullet < NumBullets)
+	{
+		AMirrorForceProjectile* Bullet = Cast<AMirrorForceProjectile>(BulletPool->SpawnPooledActor());
+		if (Bullet != nullptr)
+		{
+			FVector StartLocation = GetActorLocation();
+			StartLocation.X += FMath::RandRange(-450, 0); // horizontal offset
+			StartLocation.Y += FMath::RandRange(-1000, 1000); // depth offset
+			Bullet->SetActorLocation(StartLocation);
+			Bullet->ProjectileMovement->Velocity = FVector::ZeroVector;
+			HoveringBullets.Add(Bullet);
+		}
+		CurrentBullet++;
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
+		CurrentBullet = 0;
+		FTimerDelegate FireDel;
+		FireDel.BindUFunction(this, FName("FireHoveringBullet"));
+		GetWorld()->GetTimerManager().SetTimer(FireTimerHandle, FireDel, 0.2f, true);
+	}
+}
+
+void AMirrorForceBulletSpawner::FireHoveringBullet()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Fire."));
+		
+	if (CurrentBullet < HoveringBullets.Num())
+	{
+		FVector Direction = Player->GetActorLocation() - HoveringBullets[CurrentBullet]->GetActorLocation();
+		Direction.Normalize();
+		HoveringBullets[CurrentBullet]->ProjectileMovement->Velocity = Direction * BulletSpeed;
+		CurrentBullet++;
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().ClearTimer(FireTimerHandle);
+	}
+}
