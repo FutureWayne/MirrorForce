@@ -43,16 +43,36 @@ void AMirrorForceLaneController::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("PlayerController is NULL"));
 	}
 
-	SpaceAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, SpaceMusic, GetActorLocation());
-	AquaticAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, AquaticMusic, GetActorLocation());
-	MoonAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, MoonMusic, GetActorLocation());
+	//Set up theme music audio component
+	for (int i = 0; i < LaneSFXs.Num(); i++)
+	{
+		FLaneSFXInfo laneSFX;
+		if (GetLaneSFX(i, laneSFX))
+		{
+			laneSFX.themeAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, laneSFX.ThemeMusic, GetActorLocation());
+			laneSFX.themeAudioComponent->SetPaused(true);
+			if (!CurrentAudioComponent)
+			{
+				CurrentAudioComponent = laneSFX.themeAudioComponent;
+				CurrentAudioComponent->SetPaused(false);
+			}
+		}
+		else
+		{
+			//no SFX found
+		}
+	}
 
-	SpaceAudioComponent->SetPaused(true);
-	AquaticAudioComponent->SetPaused(true);
-	MoonAudioComponent->SetPaused(true);
+	//SpaceAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, SpaceMusic, GetActorLocation());
+	//AquaticAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, AquaticMusic, GetActorLocation());
+	//MoonAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, MoonMusic, GetActorLocation());
 
-	CurrentAudioComponent = AquaticAudioComponent;
-	CurrentAudioComponent->SetPaused(false);
+	//SpaceAudioComponent->SetPaused(true);
+	//AquaticAudioComponent->SetPaused(true);
+	//MoonAudioComponent->SetPaused(true);
+
+	//CurrentAudioComponent = AquaticAudioComponent;
+	//CurrentAudioComponent->SetPaused(false);
 }
 
 void AMirrorForceLaneController::Tick(float DeltaTime)
@@ -112,7 +132,14 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 
 	//Switch lanes theme music
 	UGameplayStatics::PlaySoundAtLocation(this, SwitchLaneSFX, GetActorLocation());
-	switch (CurrentLaneIndex)
+	FLaneSFXInfo laneSFX;
+	if (GetLaneSFX(CurrentLaneIndex, laneSFX))
+	{
+		CurrentAudioComponent->SetPaused(true);
+		laneSFX.themeAudioComponent->SetPaused(false);
+		CurrentAudioComponent = laneSFX.themeAudioComponent;
+	}
+	/*switch (CurrentLaneIndex)
 	{
 		case 0: //Aquatic
 			CurrentAudioComponent->SetPaused(true);
@@ -129,6 +156,16 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 			SpaceAudioComponent->SetPaused(false);
 			CurrentAudioComponent = SpaceAudioComponent;
 			break;
+	}*/
+}
+
+bool AMirrorForceLaneController::GetLaneSFX(int index, FLaneSFXInfo& resultSFX)
+{
+	if (index < LaneSFXs.Num())
+	{
+		resultSFX = LaneSFXs[index];
+		return true;
 	}
+	return false;
 }
 
