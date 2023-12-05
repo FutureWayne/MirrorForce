@@ -5,6 +5,8 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/MirrorAttributeSet.h"
 #include "Actor/MirrorForceShield.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 void UMirrorForceShieldAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
                                                 const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
@@ -23,7 +25,7 @@ void UMirrorForceShieldAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	if (SpawnedShield)
 	{
 		SpawnedShield->AttachToComponent(ActorInfo->AvatarActor->GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-
+		
 		// Apply ongoing mana cost
 		if (ManaCostEffectClass)
 		{
@@ -38,6 +40,8 @@ void UMirrorForceShieldAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 		{
 			ActorInfo->AbilitySystemComponent->RemoveActiveGameplayEffect(ManaRegenEffectHandle);
 		}
+
+		ShieldOn();
 	}
 }
 
@@ -70,6 +74,12 @@ void UMirrorForceShieldAbility::InputReleased(const FGameplayAbilitySpecHandle H
 		const FGameplayEffectSpecHandle EffectSpecHandle = ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(ManaRegenEffectClass, 1.0f, EffectContextHandle);
 		ManaRegenEffectHandle = ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 	}
+
+	if (SpawnedShield)
+	{
+		ShieldOff();
+	}
+
 }
 
 void UMirrorForceShieldAbility::OnManaChange(const FOnAttributeChangeData& OnAttributeChangeData)
@@ -79,7 +89,9 @@ void UMirrorForceShieldAbility::OnManaChange(const FOnAttributeChangeData& OnAtt
 	{
 		if (SpawnedShield)
 		{
+			//Shield is not destroyed!
 			SpawnedShield->Destroy();
+			ShieldOff();
 		}
 	}
 }
@@ -97,4 +109,31 @@ void UMirrorForceShieldAbility::OnGiveAbility(const FGameplayAbilityActorInfo* A
 	{
 		ActorInfo->AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MirrorAttributeSet->GetManaAttribute()).AddUObject(this, &UMirrorForceShieldAbility::OnManaChange);
 	}
+}
+
+void UMirrorForceShieldAbility::ShieldOn()
+{
+	UGameplayStatics::PlaySoundAtLocation(this, ShieldOnSFX, FVector::ZeroVector);
+	if (ShieldPersistAudioComponent == nullptr)
+	{
+		ShieldPersistAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, ShieldPersistSFX, FVector::ZeroVector);
+	}
+	else
+	{
+		ShieldPersistAudioComponent->SetPaused(false);
+	}
+	IsShieldDestroyed = false;
+}
+
+void UMirrorForceShieldAbility::ShieldOff()
+{
+	if (!IsShieldDestroyed)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ShieldOffSFX, FVector::ZeroVector);
+		if (ShieldPersistAudioComponent != nullptr)
+		{
+			ShieldPersistAudioComponent->SetPaused(false);
+		}
+	}
+	IsShieldDestroyed = true;
 }
