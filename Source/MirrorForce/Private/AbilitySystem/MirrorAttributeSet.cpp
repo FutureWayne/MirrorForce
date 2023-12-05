@@ -10,6 +10,8 @@ UMirrorAttributeSet::UMirrorAttributeSet()
 {
 	InitHealth(3.0f);
 	InitMaxHealth(3.0f);
+	InitMana(100.0f);
+	InitMaxMana(100.0f);
 }
 
 void UMirrorAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
