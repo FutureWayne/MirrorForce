@@ -15,16 +15,16 @@ AMirrorForceBulletSpawner::AMirrorForceBulletSpawner()
 
 
 //CIRCLE
-void AMirrorForceBulletSpawner::SpawnCirclePattern(int NumBullets, float AngleBetweenBullets, float BulletSpeed)
+void AMirrorForceBulletSpawner::SpawnCirclePattern(int InNumBullets, float AngleBetweenBullets, float InBulletSpeed)
 {
-	for (int i = 0; i < NumBullets; i++)
+	for (int i = 0; i < InNumBullets; i++)
 	{
 		const float Angle = i * AngleBetweenBullets;
-		SpawnBullet(Angle, BulletSpeed);
+		SpawnBullet(Angle, InBulletSpeed);
 	}
 }
 
-void AMirrorForceBulletSpawner::SpawnMultipleCircles(int NumBullets, float AngleBetweenBullets, float BulletSpeed, int NumSpirals, float DelayBetweenSpirals)
+void AMirrorForceBulletSpawner::SpawnMultipleCircles(int InNumBullets, float AngleBetweenBullets, float InBulletSpeed, int NumSpirals, float DelayBetweenSpirals)
 {
 	for (int i = 0; i <= NumSpirals; i++)
 	{
@@ -32,23 +32,23 @@ void AMirrorForceBulletSpawner::SpawnMultipleCircles(int NumBullets, float Angle
 		{
 			FTimerHandle TimerHandle;
 			FTimerDelegate TimerDel;
-			TimerDel.BindUFunction(this, FName("SpawnCirclePattern"), NumBullets, AngleBetweenBullets, BulletSpeed);
+			TimerDel.BindUFunction(this, FName("SpawnCirclePattern"), InNumBullets, AngleBetweenBullets, InBulletSpeed);
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, i * DelayBetweenSpirals, false);
 		}
 		else
 		{
-			SpawnCirclePattern(NumBullets, AngleBetweenBullets, BulletSpeed);
+			SpawnCirclePattern(InNumBullets, AngleBetweenBullets, InBulletSpeed);
 		}
 	}
 }
 
 
 //SPIRAL
-void AMirrorForceBulletSpawner::SpawnSpiralPattern(int NumBullets, float AngleIncrement, float BulletSpeed, float DelayBetweenBullets)
+void AMirrorForceBulletSpawner::SpawnSpiralPattern(int InNumBullets, float InAngleIncrement, float InBulletSpeed, float DelayBetweenBullets)
 {
-	this->NumBullets = NumBullets;
-	this->AngleIncrement = AngleIncrement;
-	this->BulletSpeed = BulletSpeed;
+	this->NumBullets = InNumBullets;
+	this->AngleIncrement = InAngleIncrement;
+	this->BulletSpeed = InBulletSpeed;
 	this->CurrentBullet = 0;
 
 	FTimerHandle TimerHandle;
@@ -71,24 +71,24 @@ void AMirrorForceBulletSpawner::SpawnBulletWithTimer()
 }
 
 
-void AMirrorForceBulletSpawner::SpawnBullet(float Angle, float BulletSpeed) const
+void AMirrorForceBulletSpawner::SpawnBullet(float Angle, float InBulletSpeed) const
 {
 	const FVector StartLocation = GetActorLocation();
 	if (AMirrorForceProjectile* Bullet = Cast<AMirrorForceProjectile>(BulletPool->SpawnPooledActor()); Bullet != nullptr)
 	{
 		Bullet->SetActorLocation(StartLocation);
 		const FVector Direction = FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.f);
-		Bullet->ProjectileMovement->Velocity = Direction * BulletSpeed;
+		Bullet->ProjectileMovement->Velocity = Direction * InBulletSpeed;
 	}
 }
 
 //HOMING
-void AMirrorForceBulletSpawner::SpawnHoveringPattern(int NumBullets, float DelayBetweenBullets, float BulletSpeed, AActor* Player)
+void AMirrorForceBulletSpawner::SpawnHoveringPattern(int InNumBullets, float DelayBetweenBullets, float InBulletSpeed, AActor* InPlayer)
 {
-	this->NumBullets = NumBullets;
+	this->NumBullets = InNumBullets;
 	this->CurrentBullet = 0;
-	this->Player = Player;
-	this->BulletSpeed = BulletSpeed;
+	this->Player = InPlayer;
+	this->BulletSpeed = InBulletSpeed;
 
 	FTimerDelegate TimerDel;
 	TimerDel.BindUFunction(this, FName("SpawnSingleHoveringBullet"));
