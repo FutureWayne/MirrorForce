@@ -55,6 +55,7 @@ void UMirrorForceShieldAbility::InputReleased(const FGameplayAbilitySpecHandle H
 		if (SpawnedShield)
 		{
 			SpawnedShield->Destroy();
+			SpawnedShield = nullptr;
 		}
 		CancelAbility(Handle, ActorInfo, ActivationInfo, true);
 	}
@@ -90,10 +91,12 @@ void UMirrorForceShieldAbility::OnManaChange(const FOnAttributeChangeData& OnAtt
 		if (SpawnedShield)
 		{
 			//Shield is not destroyed!
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Shield is not destroyed!"));
 			SpawnedShield->Destroy();
+			SpawnedShield = nullptr;
 			ShieldOff();
 		}
-	}
+	} 
 }
 
 void UMirrorForceShieldAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo,
@@ -122,18 +125,14 @@ void UMirrorForceShieldAbility::ShieldOn()
 	{
 		ShieldPersistAudioComponent->SetPaused(false);
 	}
-	IsShieldDestroyed = false;
+	
 }
 
 void UMirrorForceShieldAbility::ShieldOff()
 {
-	if (!IsShieldDestroyed)
+	UGameplayStatics::PlaySoundAtLocation(this, ShieldOffSFX, FVector::ZeroVector);
+	if (ShieldPersistAudioComponent != nullptr)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, ShieldOffSFX, FVector::ZeroVector);
-		if (ShieldPersistAudioComponent != nullptr)
-		{
-			ShieldPersistAudioComponent->SetPaused(false);
-		}
+		ShieldPersistAudioComponent->SetPaused(true);
 	}
-	IsShieldDestroyed = true;
 }

@@ -46,16 +46,15 @@ private:
 
 	FActiveGameplayEffectHandle ManaRegenEffectHandle;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USoundBase> ShieldOnSFX;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USoundBase> ShieldOffSFX;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USoundBase> ShieldPersistSFX;
 
+	UPROPERTY()
 	UAudioComponent* ShieldPersistAudioComponent;
-
-	bool IsShieldDestroyed;
 };
