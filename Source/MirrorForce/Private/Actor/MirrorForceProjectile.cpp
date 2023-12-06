@@ -59,6 +59,6 @@ void AMirrorForceProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComp
 		}
 	}
 	
-	Destroy();
+	Deactivate();
 }
 

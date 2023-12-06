@@ -18,19 +18,19 @@ public:
 	AMirrorForceBulletSpawner();
 
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
-	void SpawnCirclePattern(int NumBullets, float AngleBetweenBullets, float BulletSpeed);
+	void SpawnCirclePattern(int InNumBullets, float AngleBetweenBullets, float InBulletSpeed);
 
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
-	void SpawnMultipleCircles(int NumBullets, float AngleBetweenBullets, float BulletSpeed, int NumSpirals, float DelayBetweenSpirals);
+	void SpawnMultipleCircles(int InNumBullets, float AngleBetweenBullets, float InBulletSpeed, int NumSpirals, float DelayBetweenSpirals);
 	
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
-	void SpawnSpiralPattern(int NumBullets, float AngleIncrement, float BulletSpeed, float DelayBetweenBullets);
+	void SpawnSpiralPattern(int InNumBullets, float InAngleIncrement, float InBulletSpeed, float DelayBetweenBullets);
 
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
-	void SpawnBullet(float Angle, float BulletSpeed) const;
+	void SpawnBullet(float Angle, float InBulletSpeed) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
-	void SpawnHoveringPattern(int NumBullets, float DelayBetweenBullets,float BulletSpeed, AActor* Player);
+	void SpawnHoveringPattern(int InNumBullets, float DelayBetweenBullets,float InBulletSpeed, AActor* InPlayer);
 
 	UFUNCTION()
 	void SpawnBulletWithTimer();
@@ -50,9 +50,9 @@ private:
 	int NumBullets;
 	float AngleIncrement;
 	float BulletSpeed;
+	
 	TArray<AMirrorForceProjectile*> HoveringBullets;
 	AActor* Player; 
 	FTimerHandle SpawnTimerHandle;
 	FTimerHandle FireTimerHandle;
-
 };
