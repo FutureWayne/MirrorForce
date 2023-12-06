@@ -6,6 +6,7 @@
 #include "Camera/CameraActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
+#include "Engine/TriggerBox.h"
 
 AMirrorForceLaneController::AMirrorForceLaneController()
 {
@@ -20,10 +21,10 @@ void AMirrorForceLaneController::BeginPlay()
 	{
 		check(LaneInfo.Camera != nullptr);
 		check(LaneInfo.LaneActor != nullptr);
-		check(LaneInfo.Waypoint != nullptr);
+		check(LaneInfo.AnchorPoint != nullptr);
 
 		// Setting up camera location and anchor point locations for each lane
-		const UStaticMeshComponent* MeshComponent = LaneInfo.Waypoint->FindComponentByClass<UStaticMeshComponent>();
+		const UStaticMeshComponent* MeshComponent = LaneInfo.AnchorPoint->FindComponentByClass<UStaticMeshComponent>();
 		FBox BoundingBox = MeshComponent->CalcBounds(MeshComponent->GetComponentTransform()).GetBox();
 		FVector CenterLocation = BoundingBox.GetCenter();
 		CenterLocation.X -= 1000.f;
@@ -31,6 +32,8 @@ void AMirrorForceLaneController::BeginPlay()
 		AnchorPointLocations.Add(CenterLocation);
 		
 		LaneInfo.Camera->SetActorLocation(CenterLocation);
+
+		LaneInfo.EndingTriggerBox->OnActorBeginOverlap.AddDynamic(this, &AMirrorForceLaneController::OnTriggerBoxOverlap);
 	}
 
 	// Use the first camera as the starting camera
@@ -53,6 +56,14 @@ void AMirrorForceLaneController::BeginPlay()
 
 	CurrentAudioComponent = AquaticAudioComponent;
 	CurrentAudioComponent->SetPaused(false);
+}
+
+void AMirrorForceLaneController::OnTriggerBoxOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn())
+	{
+		// TODO: Winning Condition
+	}
 }
 
 void AMirrorForceLaneController::Tick(float DeltaTime)

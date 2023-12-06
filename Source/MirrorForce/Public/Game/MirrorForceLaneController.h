@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "MirrorForceLaneController.generated.h"
 
+class ATriggerBox;
+
 USTRUCT(BlueprintType)
 struct FLaneInfo
 {
@@ -15,7 +17,10 @@ struct FLaneInfo
 	AActor* LaneActor = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")
-	AActor* Waypoint = nullptr;
+	AActor* AnchorPoint = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")
+	ATriggerBox* EndingTriggerBox = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")
 	ACameraActor* Camera = nullptr;
@@ -44,6 +49,9 @@ protected:
 	TArray<FLaneInfo> Lanes = {};
 
 private:
+	UFUNCTION()
+	void OnTriggerBoxOverlap(AActor* OverlappedActor, AActor* OtherActor);
+	
 	int CurrentLaneIndex = 0;
 
 	TArray<FVector> AnchorPointLocations = {};
