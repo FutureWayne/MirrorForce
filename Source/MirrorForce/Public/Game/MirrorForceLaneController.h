@@ -51,7 +51,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Lane Scroller")
 	void ChangeToNextScrollingLane();
 
-	bool GetLaneSFX(int index, FLaneSFXInfo &resultSFX);
 
 protected:
 	virtual void BeginPlay() override;
@@ -70,20 +69,8 @@ private:
 
 	TArray<FVector> AnchorPointLocations = {};
 
-	//UPROPERTY(EditAnywhere)
-	//TObjectPtr<USoundBase> SpaceMusic;
-	
-	//UPROPERTY(EditAnywhere)
-	//TObjectPtr<USoundBase> AquaticMusic;
-
-	//UPROPERTY(EditAnywhere)
-	//TObjectPtr<USoundBase> MoonMusic;
-
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> SwitchLaneSFX;
 
 	UAudioComponent* CurrentAudioComponent;
-	//UAudioComponent* SpaceAudioComponent;
-	//UAudioComponent* AquaticAudioComponent;
-	//UAudioComponent* MoonAudioComponent;
 };

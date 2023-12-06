@@ -46,33 +46,21 @@ void AMirrorForceLaneController::BeginPlay()
 	//Set up theme music audio component
 	for (int i = 0; i < LaneSFXs.Num(); i++)
 	{
-		FLaneSFXInfo laneSFX;
-		if (GetLaneSFX(i, laneSFX))
+		if (LaneSFXs.IsValidIndex(i))
 		{
-			laneSFX.themeAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, laneSFX.ThemeMusic, GetActorLocation());
-			laneSFX.themeAudioComponent->SetPaused(true);
+			LaneSFXs[i].themeAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, LaneSFXs[i].ThemeMusic, GetActorLocation());
+			LaneSFXs[i].themeAudioComponent->SetPaused(true);
 			if (!CurrentAudioComponent)
 			{
-				CurrentAudioComponent = laneSFX.themeAudioComponent;
+				CurrentAudioComponent = LaneSFXs[i].themeAudioComponent;
 				CurrentAudioComponent->SetPaused(false);
 			}
 		}
 		else
 		{
-			//no SFX found
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("No SFX assign in bp!"));
 		}
 	}
-
-	//SpaceAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, SpaceMusic, GetActorLocation());
-	//AquaticAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, AquaticMusic, GetActorLocation());
-	//MoonAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, MoonMusic, GetActorLocation());
-
-	//SpaceAudioComponent->SetPaused(true);
-	//AquaticAudioComponent->SetPaused(true);
-	//MoonAudioComponent->SetPaused(true);
-
-	//CurrentAudioComponent = AquaticAudioComponent;
-	//CurrentAudioComponent->SetPaused(false);
 }
 
 void AMirrorForceLaneController::Tick(float DeltaTime)
@@ -132,40 +120,15 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 
 	//Switch lanes theme music
 	UGameplayStatics::PlaySoundAtLocation(this, SwitchLaneSFX, GetActorLocation());
-	FLaneSFXInfo laneSFX;
-	if (GetLaneSFX(CurrentLaneIndex, laneSFX))
+	if (LaneSFXs.IsValidIndex(CurrentLaneIndex))
 	{
 		CurrentAudioComponent->SetPaused(true);
-		laneSFX.themeAudioComponent->SetPaused(false);
-		CurrentAudioComponent = laneSFX.themeAudioComponent;
+		LaneSFXs[CurrentLaneIndex].themeAudioComponent->SetPaused(false);
+		CurrentAudioComponent = LaneSFXs[CurrentLaneIndex].themeAudioComponent;
 	}
-	/*switch (CurrentLaneIndex)
+	else
 	{
-		case 0: //Aquatic
-			CurrentAudioComponent->SetPaused(true);
-			AquaticAudioComponent->SetPaused(false);
-			CurrentAudioComponent = AquaticAudioComponent;
-			break;
-		case 1: //Moon
-			CurrentAudioComponent->SetPaused(true);
-			MoonAudioComponent->SetPaused(false);
-			CurrentAudioComponent = MoonAudioComponent;
-			break;
-		case 2: //Space
-			CurrentAudioComponent->SetPaused(true); 
-			SpaceAudioComponent->SetPaused(false);
-			CurrentAudioComponent = SpaceAudioComponent;
-			break;
-	}*/
-}
-
-bool AMirrorForceLaneController::GetLaneSFX(int index, FLaneSFXInfo& resultSFX)
-{
-	if (index < LaneSFXs.Num())
-	{
-		resultSFX = LaneSFXs[index];
-		return true;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Can't find SFX"));
 	}
-	return false;
 }
 
