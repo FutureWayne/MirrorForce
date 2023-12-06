@@ -26,6 +26,23 @@ struct FLaneInfo
 	ACameraActor* Camera = nullptr;
 };
 
+USTRUCT(BlueprintType)
+struct FLaneSFXInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane SFX")
+	TObjectPtr<USoundBase> ThemeMusic;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane SFX")
+	TObjectPtr<USoundBase> VictoryMusic;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane SFX")
+	TObjectPtr<USoundBase> LoseMusic;
+
+	UAudioComponent* themeAudioComponent;
+};
+
 UCLASS()
 class MIRRORFORCE_API AMirrorForceLaneController : public AActor
 {
@@ -39,6 +56,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Lane Scroller")
 	void ChangeToNextScrollingLane();
 
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -47,6 +65,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")
 	TArray<FLaneInfo> Lanes = {};
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane SFX")
+	TArray<FLaneSFXInfo> LaneSFXs = {};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")
 	TObjectPtr<AActor> BossActor = nullptr;
@@ -60,19 +81,7 @@ private:
 	TArray<FVector> AnchorPointLocations = {};
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<USoundBase> SpaceMusic;
-	
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<USoundBase> AquaticMusic;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<USoundBase> MoonMusic;
-
-	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> SwitchLaneSFX;
 
 	UAudioComponent* CurrentAudioComponent;
-	UAudioComponent* SpaceAudioComponent;
-	UAudioComponent* AquaticAudioComponent;
-	UAudioComponent* MoonAudioComponent;
 };

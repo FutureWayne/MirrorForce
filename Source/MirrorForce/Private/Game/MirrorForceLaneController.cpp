@@ -46,16 +46,24 @@ void AMirrorForceLaneController::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("PlayerController is NULL"));
 	}
 
-	SpaceAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, SpaceMusic, GetActorLocation());
-	AquaticAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, AquaticMusic, GetActorLocation());
-	MoonAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, MoonMusic, GetActorLocation());
-
-	SpaceAudioComponent->SetPaused(true);
-	AquaticAudioComponent->SetPaused(true);
-	MoonAudioComponent->SetPaused(true);
-
-	CurrentAudioComponent = AquaticAudioComponent;
-	CurrentAudioComponent->SetPaused(false);
+	//Set up theme music audio component
+	for (int i = 0; i < LaneSFXs.Num(); i++)
+	{
+		if (LaneSFXs.IsValidIndex(i))
+		{
+			LaneSFXs[i].themeAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, LaneSFXs[i].ThemeMusic, GetActorLocation());
+			LaneSFXs[i].themeAudioComponent->SetPaused(true);
+			if (!CurrentAudioComponent)
+			{
+				CurrentAudioComponent = LaneSFXs[i].themeAudioComponent;
+				CurrentAudioComponent->SetPaused(false);
+			}
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("No SFX assign in bp!"));
+		}
+	}
 }
 
 void AMirrorForceLaneController::OnTriggerBoxOverlap(AActor* OverlappedActor, AActor* OtherActor)
@@ -131,23 +139,15 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 	
 	//Switch lanes theme music
 	UGameplayStatics::PlaySoundAtLocation(this, SwitchLaneSFX, GetActorLocation());
-	switch (CurrentLaneIndex)
+	if (LaneSFXs.IsValidIndex(CurrentLaneIndex))
 	{
-		case 0: //Aquatic
-			CurrentAudioComponent->SetPaused(true);
-			AquaticAudioComponent->SetPaused(false);
-			CurrentAudioComponent = AquaticAudioComponent;
-			break;
-		case 1: //Moon
-			CurrentAudioComponent->SetPaused(true);
-			MoonAudioComponent->SetPaused(false);
-			CurrentAudioComponent = MoonAudioComponent;
-			break;
-		case 2: //Space
-			CurrentAudioComponent->SetPaused(true); 
-			SpaceAudioComponent->SetPaused(false);
-			CurrentAudioComponent = SpaceAudioComponent;
-			break;
+		CurrentAudioComponent->SetPaused(true);
+		LaneSFXs[CurrentLaneIndex].themeAudioComponent->SetPaused(false);
+		CurrentAudioComponent = LaneSFXs[CurrentLaneIndex].themeAudioComponent;
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Can't find SFX"));
 	}
 }
 
