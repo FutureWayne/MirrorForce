@@ -49,6 +49,7 @@ protected:
 	TArray<FLaneInfo> Lanes = {};
 
 private:
+	UFUNCTION()
 	void OnTriggerBoxOverlap(AActor* OverlappedActor, AActor* OtherActor);
 	
 	int CurrentLaneIndex = 0;
