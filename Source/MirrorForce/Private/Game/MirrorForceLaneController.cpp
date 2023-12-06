@@ -6,6 +6,7 @@
 #include "Camera/CameraActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
+#include "Engine/TriggerBox.h"
 
 AMirrorForceLaneController::AMirrorForceLaneController()
 {
@@ -20,10 +21,10 @@ void AMirrorForceLaneController::BeginPlay()
 	{
 		check(LaneInfo.Camera != nullptr);
 		check(LaneInfo.LaneActor != nullptr);
-		check(LaneInfo.Waypoint != nullptr);
+		check(LaneInfo.AnchorPoint != nullptr);
 
 		// Setting up camera location and anchor point locations for each lane
-		const UStaticMeshComponent* MeshComponent = LaneInfo.Waypoint->FindComponentByClass<UStaticMeshComponent>();
+		const UStaticMeshComponent* MeshComponent = LaneInfo.AnchorPoint->FindComponentByClass<UStaticMeshComponent>();
 		FBox BoundingBox = MeshComponent->CalcBounds(MeshComponent->GetComponentTransform()).GetBox();
 		FVector CenterLocation = BoundingBox.GetCenter();
 		CenterLocation.X -= 1000.f;
@@ -31,6 +32,8 @@ void AMirrorForceLaneController::BeginPlay()
 		AnchorPointLocations.Add(CenterLocation);
 		
 		LaneInfo.Camera->SetActorLocation(CenterLocation);
+
+		LaneInfo.EndingTriggerBox->OnActorBeginOverlap.AddDynamic(this, &AMirrorForceLaneController::OnTriggerBoxOverlap);
 	}
 
 	// Use the first camera as the starting camera
@@ -60,6 +63,14 @@ void AMirrorForceLaneController::BeginPlay()
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("No SFX assign in bp!"));
 		}
+	}
+}
+
+void AMirrorForceLaneController::OnTriggerBoxOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn())
+	{
+		// TODO: Winning Condition
 	}
 }
 
@@ -116,8 +127,16 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 		UE_LOG(LogTemp, Warning, TEXT("Player is NULL"));
 	}
 
-	// TODO: Move Boss by delta location
-
+	// Move Boss Actor by delta location
+	if (BossActor)
+	{
+		BossActor->SetActorLocation(BossActor->GetActorLocation() + DeltaLocation);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BossActor is NULL"));
+	}
+	
 	//Switch lanes theme music
 	UGameplayStatics::PlaySoundAtLocation(this, SwitchLaneSFX, GetActorLocation());
 	if (LaneSFXs.IsValidIndex(CurrentLaneIndex))

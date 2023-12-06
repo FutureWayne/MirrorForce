@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Actor/ActorPool/MirrorForceActorPool.h"
+#include "ActorPool/MirrorForcePooledActor.h"
 #include "Actor/MirrorForceProjectile.h"
 #include "MirrorForceBulletSpawner.generated.h"
 
 
 UCLASS()
-class MIRRORFORCE_API AMirrorForceBulletSpawner : public AActor
+class MIRRORFORCE_API AMirrorForceBulletSpawner : public AMirrorForcePooledActor
 {
 	GENERATED_BODY()
 
