@@ -119,8 +119,16 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 		UE_LOG(LogTemp, Warning, TEXT("Player is NULL"));
 	}
 
-	// TODO: Move Boss by delta location
-
+	// Move Boss Actor by delta location
+	if (BossActor)
+	{
+		BossActor->SetActorLocation(BossActor->GetActorLocation() + DeltaLocation);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BossActor is NULL"));
+	}
+	
 	//Switch lanes theme music
 	UGameplayStatics::PlaySoundAtLocation(this, SwitchLaneSFX, GetActorLocation());
 	switch (CurrentLaneIndex)

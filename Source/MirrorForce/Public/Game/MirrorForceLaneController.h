@@ -48,6 +48,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")
 	TArray<FLaneInfo> Lanes = {};
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane Scroller")
+	TObjectPtr<AActor> BossActor = nullptr;
+
 private:
 	UFUNCTION()
 	void OnTriggerBoxOverlap(AActor* OverlappedActor, AActor* OtherActor);
