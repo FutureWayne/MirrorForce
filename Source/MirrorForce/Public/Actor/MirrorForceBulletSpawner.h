@@ -19,10 +19,10 @@ public:
 	AMirrorForceBulletSpawner();
 
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
-	void SpawnCirclePattern(int InNumBullets, float AngleBetweenBullets, float InBulletSpeed);
+	void SpawnCirclePattern(float MaxAngle, float AngleBetweenBullets, float InBulletSpeed, const FVector& Offset);
 
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
-	void SpawnMultipleCircles(int InNumBullets, float AngleBetweenBullets, float InBulletSpeed, int NumSpirals, float DelayBetweenSpirals);
+	void SpawnMultipleCircles(float MaxAngle, float AngleBetweenBullets, float InBulletSpeed, int NumSpirals, float DelayBetweenSpirals, const FVector& Offset);
 	
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
 	void SpawnSpiralPattern(int InNumBullets, float InAngleIncrement, float InBulletSpeed, float DelayBetweenBullets);
@@ -31,16 +31,25 @@ public:
 	void SpawnBullet(float Angle, float InBulletSpeed) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
-	void SpawnHoveringPattern(int InNumBullets, float DelayBetweenBullets,float InBulletSpeed, AActor* InPlayer);
+	void SpawnHoveringPattern(int InNumBullets, float DelayBetweenBullets,float InBulletSpeed);
 
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
 	void SpawnFanPattern(int InNumLines, int InNumBulletsPerLine, float InRotateSpeed);
 
+	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
+	void SpawnMultipleCross(int NumBalls, float InitialSpeed, float BurstSpeed, float Delay, float SpawnDelay);
+	
+	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
+	void SpawnCrossPattern(float InitialSpeed, float BurstSpeed, float Delay);
+
 	UFUNCTION()
-	void SpawnBulletAtDistance(float Angle, float Distance);
+	void SpawnSingleBulletInLine();
 
 	UFUNCTION()
 	void SpawnBulletWithTimer();
+
+	UFUNCTION()
+	void SpawnBulletAtDistance(float Angle, float Distance);
 
 	UFUNCTION()
 	void StartRotate();
@@ -55,17 +64,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet Pattern")
 	TObjectPtr<UMirrorForceActorPool> BulletPool;
 
+	virtual void BeginPlay() override;
+
 private:
 	int CurrentBullet = 0;
 	int NumBullets;
+	int NumLines;
+	int NumBulletsPerLine;
+	int CurrentLine;
 	float AngleIncrement;
 	float BulletSpeed;
 	float RotateSpeed;
 	
 	TArray<AMirrorForceProjectile*> HoveringBullets;
-	AActor* Player; 
+	APawn* Player;
 	FTimerHandle SpawnTimerHandle;
 	FTimerHandle FireTimerHandle;
+	FTimerHandle RotationTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> FireSFX;

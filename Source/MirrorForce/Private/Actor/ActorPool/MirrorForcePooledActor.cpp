@@ -26,6 +26,7 @@ void AMirrorForcePooledActor::SetPoolIndex(int index)
 
 void AMirrorForcePooledActor::Deactivate()
 {
+	SetActorLocation(FVector(0,0,0));
 	SetActive(false);
 	GetWorldTimerManager().ClearAllTimersForObject(this);
 	OnPooledActorDespawn.Broadcast(this);
