@@ -37,9 +37,12 @@ void AMirrorForceProjectile::BeginPlay()
 void AMirrorForceProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-
+	if (OtherActor->ActorHasTag("Player"))
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+	}
+	
 	if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 	{
 		if (DamageEffectSpecHandle.Data.Get() == nullptr && DamageGameplayEffectClass)
@@ -59,6 +62,6 @@ void AMirrorForceProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComp
 		}
 	}
 	
-	Destroy();
+	Deactivate();
 }
 

@@ -4,6 +4,9 @@
 #include "Game/MirrorForceLaneController.h"
 
 #include "Camera/CameraActor.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
+#include "Engine/TriggerBox.h"
 
 AMirrorForceLaneController::AMirrorForceLaneController()
 {
@@ -18,10 +21,10 @@ void AMirrorForceLaneController::BeginPlay()
 	{
 		check(LaneInfo.Camera != nullptr);
 		check(LaneInfo.LaneActor != nullptr);
-		check(LaneInfo.Waypoint != nullptr);
+		check(LaneInfo.AnchorPoint != nullptr);
 
 		// Setting up camera location and anchor point locations for each lane
-		const UStaticMeshComponent* MeshComponent = LaneInfo.Waypoint->FindComponentByClass<UStaticMeshComponent>();
+		const UStaticMeshComponent* MeshComponent = LaneInfo.AnchorPoint->FindComponentByClass<UStaticMeshComponent>();
 		FBox BoundingBox = MeshComponent->CalcBounds(MeshComponent->GetComponentTransform()).GetBox();
 		FVector CenterLocation = BoundingBox.GetCenter();
 		CenterLocation.X -= 1000.f;
@@ -29,6 +32,8 @@ void AMirrorForceLaneController::BeginPlay()
 		AnchorPointLocations.Add(CenterLocation);
 		
 		LaneInfo.Camera->SetActorLocation(CenterLocation);
+
+		LaneInfo.EndingTriggerBox->OnActorBeginOverlap.AddDynamic(this, &AMirrorForceLaneController::OnTriggerBoxOverlap);
 	}
 
 	// Use the first camera as the starting camera
@@ -36,9 +41,31 @@ void AMirrorForceLaneController::BeginPlay()
 	{
 		PlayerController->SetViewTarget(Lanes[0].Camera);
 	}
-	else
+
+	//Set up theme music audio component
+	for (int i = 0; i < LaneSFXs.Num(); i++)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerController is NULL"));
+		check(LaneSFXs.IsValidIndex(i))
+		LaneSFXs[i].ThemeAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, LaneSFXs[i].ThemeMusic, GetActorLocation());
+		LaneSFXs[i].ThemeAudioComponent->SetPaused(true);
+		if (!CurrentAudioComponent)
+		{
+			CurrentAudioComponent = LaneSFXs[i].ThemeAudioComponent;
+			CurrentAudioComponent->SetPaused(false);
+		}
+	}
+}
+
+void AMirrorForceLaneController::OnTriggerBoxOverlap(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn())
+	{
+		// TODO: Winning Condition
+		if (LaneSFXs.IsValidIndex(CurrentLaneIndex))
+		{
+			CurrentAudioComponent->SetPaused(true);
+			UGameplayStatics::SpawnSoundAtLocation(this, LaneSFXs[CurrentLaneIndex].VictoryMusic, GetActorLocation());
+		}
 	}
 }
 
@@ -73,14 +100,7 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 	CurrentLaneIndex = (CurrentLaneIndex + 1) % Lanes.Num();
 
 	// Use the next camera as the new view target
-	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
-	{
-		PlayerController->SetViewTarget(Lanes[CurrentLaneIndex].Camera);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerController is NULL"));
-	}
+	UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->SetViewTarget(Lanes[CurrentLaneIndex].Camera);
 
 	const FVector NewAnchorPointLocation = AnchorPointLocations[CurrentLaneIndex];
 	const FVector DeltaLocation = NewAnchorPointLocation - LastAnchorPointLocation;
@@ -95,6 +115,31 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 		UE_LOG(LogTemp, Warning, TEXT("Player is NULL"));
 	}
 
-	// TODO: Move Boss by delta location
+	// Move Boss Actor by delta location
+	if (BossActor)
+	{
+		BossActor->SetActorLocation(BossActor->GetActorLocation() + DeltaLocation);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BossActor is NULL"));
+	}
+	
+	//Switch lanes theme music
+	UGameplayStatics::PlaySoundAtLocation(this, SwitchLaneSFX, GetActorLocation());
+	check(LaneSFXs.IsValidIndex(CurrentLaneIndex));
+	CurrentAudioComponent->SetPaused(true);
+	LaneSFXs[CurrentLaneIndex].ThemeAudioComponent->SetPaused(false);
+	CurrentAudioComponent = LaneSFXs[CurrentLaneIndex].ThemeAudioComponent;
+}
+
+FLaneSFXInfo AMirrorForceLaneController::GetLaneSFXInfo()
+{
+	return LaneSFXs[CurrentLaneIndex];
+}
+
+void AMirrorForceLaneController::StopThemeMusic()
+{
+	CurrentAudioComponent->SetPaused(true);
 }
 

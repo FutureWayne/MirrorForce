@@ -10,6 +10,8 @@ void UOverlayWidgetController::BroadcastInitialValues()
 	{
 		OnHealthChanged.Broadcast(MirrorAttributeSet->GetHealth());
 		OnMaxHealthChanged.Broadcast(MirrorAttributeSet->GetMaxHealth());
+		OnManaChanged.Broadcast(MirrorAttributeSet->GetMana());
+		OnMaxManaChanged.Broadcast(MirrorAttributeSet->GetMaxMana());
 	}
 }
 
@@ -28,6 +30,20 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		[this](const FOnAttributeChangeData& Data)
 		{
 			OnMaxHealthChanged.Broadcast(Data.NewValue);
+		}
+	);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MirrorAttributeSet->GetManaAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnManaChanged.Broadcast(Data.NewValue);
+		}
+	);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MirrorAttributeSet->GetMaxManaAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnMaxManaChanged.Broadcast(Data.NewValue);
 		}
 	);
 }
