@@ -6,6 +6,7 @@
 #include "Character/MirrorForceCharacterBase.h"
 #include "MirrorForceCharacter.generated.h"
 
+class UNiagaraSystem;
 class UAbilitySystemComponent;
 class UAttributeSet;
 
@@ -21,21 +22,22 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	
 	virtual void PossessedBy(AController* NewController) override;
-
-	/** Returns TopDownCameraComponent subobject **/
-	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
+	
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
-private:
-	/** Top down camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UCameraComponent> TopDownCameraComponent;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AbilitySystem")
+	TObjectPtr<UNiagaraSystem> DeathEffect;
 
+private:
+	void InitAbilityActorInfo();
+	void OnPlayerDead();
+	void OnHealthChange(const struct FOnAttributeChangeData& OnAttributeChangeData);
+
+	bool bIsDead = false;
+	
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpringArmComponent> CameraBoom;
-	
-	void InitAbilityActorInfo();
 };
 

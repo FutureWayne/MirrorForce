@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Actor/ActorPool/MirrorForceActorPool.h"
+#include "ActorPool/MirrorForcePooledActor.h"
 #include "Actor/MirrorForceProjectile.h"
 #include "MirrorForceBulletSpawner.generated.h"
 
 
 UCLASS()
-class MIRRORFORCE_API AMirrorForceBulletSpawner : public AActor
+class MIRRORFORCE_API AMirrorForceBulletSpawner : public AMirrorForcePooledActor
 {
 	GENERATED_BODY()
 
@@ -32,8 +33,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
 	void SpawnHoveringPattern(int InNumBullets, float DelayBetweenBullets,float InBulletSpeed, AActor* InPlayer);
 
+	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
+	void SpawnFanPattern(int InNumLines, int InNumBulletsPerLine, float InRotateSpeed);
+
+	UFUNCTION()
+	void SpawnBulletAtDistance(float Angle, float Distance);
+
 	UFUNCTION()
 	void SpawnBulletWithTimer();
+
+	UFUNCTION()
+	void StartRotate();
 
 	UFUNCTION()
 	void FireHoveringBullet();
@@ -50,9 +60,13 @@ private:
 	int NumBullets;
 	float AngleIncrement;
 	float BulletSpeed;
+	float RotateSpeed;
 	
 	TArray<AMirrorForceProjectile*> HoveringBullets;
 	AActor* Player; 
 	FTimerHandle SpawnTimerHandle;
 	FTimerHandle FireTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> FireSFX;
 };

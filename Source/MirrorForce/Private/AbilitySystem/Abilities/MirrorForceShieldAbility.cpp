@@ -59,7 +59,6 @@ void UMirrorForceShieldAbility::InputReleased(const FGameplayAbilitySpecHandle H
 		}
 		CancelAbility(Handle, ActorInfo, ActivationInfo, true);
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Input Released"));
 
 	// Remove ongoing mana cost
 	if (ManaCostEffectHandle.IsValid())
@@ -90,8 +89,6 @@ void UMirrorForceShieldAbility::OnManaChange(const FOnAttributeChangeData& OnAtt
 	{
 		if (SpawnedShield)
 		{
-			//Shield is not destroyed!
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Shield is not destroyed!"));
 			SpawnedShield->Destroy();
 			SpawnedShield = nullptr;
 			ShieldOff();
