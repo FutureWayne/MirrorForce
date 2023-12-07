@@ -71,6 +71,12 @@ void AMirrorForceLaneController::OnTriggerBoxOverlap(AActor* OverlappedActor, AA
 	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn())
 	{
 		// TODO: Winning Condition
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("WIN!"));
+		if (LaneSFXs.IsValidIndex(CurrentLaneIndex))
+		{
+			CurrentAudioComponent->SetPaused(true);
+			UGameplayStatics::SpawnSoundAtLocation(this, LaneSFXs[CurrentLaneIndex].VictoryMusic, GetActorLocation());
+		}
 	}
 }
 
