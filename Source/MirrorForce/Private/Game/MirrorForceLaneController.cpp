@@ -41,27 +41,17 @@ void AMirrorForceLaneController::BeginPlay()
 	{
 		PlayerController->SetViewTarget(Lanes[0].Camera);
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerController is NULL"));
-	}
 
 	//Set up theme music audio component
 	for (int i = 0; i < LaneSFXs.Num(); i++)
 	{
-		if (LaneSFXs.IsValidIndex(i))
+		check(LaneSFXs.IsValidIndex(i))
+		LaneSFXs[i].ThemeAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, LaneSFXs[i].ThemeMusic, GetActorLocation());
+		LaneSFXs[i].ThemeAudioComponent->SetPaused(true);
+		if (!CurrentAudioComponent)
 		{
-			LaneSFXs[i].ThemeAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, LaneSFXs[i].ThemeMusic, GetActorLocation());
-			LaneSFXs[i].ThemeAudioComponent->SetPaused(true);
-			if (!CurrentAudioComponent)
-			{
-				CurrentAudioComponent = LaneSFXs[i].ThemeAudioComponent;
-				CurrentAudioComponent->SetPaused(false);
-			}
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("No SFX assign in bp!"));
+			CurrentAudioComponent = LaneSFXs[i].ThemeAudioComponent;
+			CurrentAudioComponent->SetPaused(false);
 		}
 	}
 }
@@ -71,7 +61,6 @@ void AMirrorForceLaneController::OnTriggerBoxOverlap(AActor* OverlappedActor, AA
 	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn())
 	{
 		// TODO: Winning Condition
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("WIN!"));
 		if (LaneSFXs.IsValidIndex(CurrentLaneIndex))
 		{
 			CurrentAudioComponent->SetPaused(true);
@@ -138,16 +127,10 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 	
 	//Switch lanes theme music
 	UGameplayStatics::PlaySoundAtLocation(this, SwitchLaneSFX, GetActorLocation());
-	if (LaneSFXs.IsValidIndex(CurrentLaneIndex))
-	{
-		CurrentAudioComponent->SetPaused(true);
-		LaneSFXs[CurrentLaneIndex].ThemeAudioComponent->SetPaused(false);
-		CurrentAudioComponent = LaneSFXs[CurrentLaneIndex].ThemeAudioComponent;
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Can't find SFX"));
-	}
+	check(LaneSFXs.IsValidIndex(CurrentLaneIndex));
+	CurrentAudioComponent->SetPaused(true);
+	LaneSFXs[CurrentLaneIndex].ThemeAudioComponent->SetPaused(false);
+	CurrentAudioComponent = LaneSFXs[CurrentLaneIndex].ThemeAudioComponent;
 }
 
 FLaneSFXInfo AMirrorForceLaneController::GetLaneSFXInfo()

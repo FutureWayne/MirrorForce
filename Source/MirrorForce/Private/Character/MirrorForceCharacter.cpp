@@ -91,7 +91,6 @@ void AMirrorForceCharacter::OnPlayerDead()
 		return;
 	}
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("You died!"));
 	if (const AMirrorForceGameModeBase* GameMode = Cast<AMirrorForceGameModeBase>(GetWorld()->GetAuthGameMode()))
 	{
 		AMirrorForceLaneController* LaneController = GameMode->LaneController;;
@@ -137,7 +136,6 @@ void AMirrorForceCharacter::OnPlayerDead()
 
 void AMirrorForceCharacter::OnHealthChange(const FOnAttributeChangeData& OnAttributeChangeData)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Health changed to %f"), OnAttributeChangeData.NewValue));
 	if (OnAttributeChangeData.NewValue <= 0.0f)
 	{
 		OnPlayerDead();
