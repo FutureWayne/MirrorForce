@@ -93,7 +93,9 @@ void AMirrorForceCharacter::OnPlayerDead()
 	
 	if (const AMirrorForceGameModeBase* GameMode = Cast<AMirrorForceGameModeBase>(GetWorld()->GetAuthGameMode()))
 	{
-		AMirrorForceLaneController* LaneController = GameMode->LaneController;;
+		AMirrorForceLaneController* LaneController = GameMode->LaneController;
+		LaneController->OnGameEnd();
+		
 		LaneController->StopThemeMusic();
 		const TObjectPtr<USoundBase> LoseSFX = LaneController->GetLaneSFXInfo().LoseMusic;
 		UGameplayStatics::SpawnSoundAtLocation(this, LoseSFX, GetActorLocation());

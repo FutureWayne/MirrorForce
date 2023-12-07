@@ -231,18 +231,7 @@ void AMirrorForceBulletSpawner::SpawnCrossPattern(float InitialSpeed, float Burs
 
 			FTimerHandle TimerHandle;
 			FTimerDelegate TimerDel;
-			TimerDel.BindLambda([Bullet, i, BurstSpeed]()
-				{
-					FVector Direction;
-					switch (i)
-					{
-					case 0: Direction = FVector(FMath::Sqrt(2.0f) / 2, FMath::Sqrt(2.0f) / 2, 0); break; 
-					case 1: Direction = FVector(-FMath::Sqrt(2.0f) / 2, FMath::Sqrt(2.0f) / 2, 0); break; 
-					case 2: Direction = FVector(-FMath::Sqrt(2.0f) / 2, -FMath::Sqrt(2.0f) / 2, 0); break; 
-					case 3: Direction = FVector(FMath::Sqrt(2.0f) / 2, -FMath::Sqrt(2.0f) / 2, 0); break;
-					}
-					Bullet->ProjectileMovement->Velocity = Direction * BurstSpeed;
-				});
+			TimerDel.BindUFunction(this, FName("GenerateCrossBullet"), Bullet, i, BurstSpeed);
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, Delay, false);
 		}
 	}
@@ -260,3 +249,18 @@ void AMirrorForceBulletSpawner::SpawnMultipleCross(int NumBalls, float InitialSp
 	}
 }
 
+void AMirrorForceBulletSpawner::GenerateCrossBullet(AMirrorForceProjectile* Bullet, int i, float BurstSpeed)
+{
+	FVector Direction;
+	switch (i)
+	{
+	case 0: Direction = FVector(FMath::Sqrt(2.0f) / 2, FMath::Sqrt(2.0f) / 2, 0); break; 
+	case 1: Direction = FVector(-FMath::Sqrt(2.0f) / 2, FMath::Sqrt(2.0f) / 2, 0); break; 
+	case 2: Direction = FVector(-FMath::Sqrt(2.0f) / 2, -FMath::Sqrt(2.0f) / 2, 0); break; 
+	case 3: Direction = FVector(FMath::Sqrt(2.0f) / 2, -FMath::Sqrt(2.0f) / 2, 0); break;
+	}
+	if (Bullet && Bullet->ProjectileMovement)
+	{
+		Bullet->ProjectileMovement->Velocity = Direction * BurstSpeed;
+	}
+}
