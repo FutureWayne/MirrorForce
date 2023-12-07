@@ -56,4 +56,7 @@ private:
 	AActor* Player; 
 	FTimerHandle SpawnTimerHandle;
 	FTimerHandle FireTimerHandle;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> FireSFX;
 };
