@@ -13,6 +13,9 @@
 #include "AbilitySystem/MirrorAttributeSet.h"
 #include "Player/MirrorForcePlayerState.h"
 #include "UI/HUD/MirrorForceHUD.h"
+#include <Kismet/GameplayStatics.h>
+#include <Game/MirrorForceLaneController.h>
+#include <Game/MirrorForceGameModeBase.h>
 
 AMirrorForceCharacter::AMirrorForceCharacter()
 {
@@ -90,7 +93,15 @@ void AMirrorForceCharacter::OnHealthChange(const FOnAttributeChangeData& OnAttri
 	if (OnAttributeChangeData.NewValue <= 0.0f)
 	{
 		// TODO: Losing Condition
+		// Should change scene after lose sfx played
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("You died!"));
+		if (const AMirrorForceGameModeBase* GameMode = Cast<AMirrorForceGameModeBase>(GetWorld()->GetAuthGameMode()))
+		{
+			AMirrorForceLaneController* LaneController = GameMode->LaneController;;
+			LaneController->StopThemeMusic();
+			TObjectPtr<USoundBase> LoseSFX = LaneController->GetLaneSFXInfo().LoseMusic;
+			UGameplayStatics::SpawnSoundAtLocation(this, LoseSFX, GetActorLocation());
+		}
 	}
 }
 

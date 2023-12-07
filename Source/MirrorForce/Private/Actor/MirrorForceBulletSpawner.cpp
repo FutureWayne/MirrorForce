@@ -4,6 +4,7 @@
 #include "Actor/MirrorForceBulletSpawner.h"
 #include "Actor/MirrorForceProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values for this component's properties
 AMirrorForceBulletSpawner::AMirrorForceBulletSpawner()
@@ -22,6 +23,7 @@ void AMirrorForceBulletSpawner::SpawnCirclePattern(int InNumBullets, float Angle
 		const float Angle = i * AngleBetweenBullets;
 		SpawnBullet(Angle, InBulletSpeed);
 	}
+	UGameplayStatics::SpawnSoundAtLocation(this, FireSFX, GetActorLocation());
 }
 
 void AMirrorForceBulletSpawner::SpawnMultipleCircles(int InNumBullets, float AngleBetweenBullets, float InBulletSpeed, int NumSpirals, float DelayBetweenSpirals)
@@ -55,6 +57,7 @@ void AMirrorForceBulletSpawner::SpawnSpiralPattern(int InNumBullets, float InAng
 	FTimerDelegate TimerDel;
 	TimerDel.BindUFunction(this, FName("SpawnBulletWithTimer"));
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, DelayBetweenBullets, true);
+	UGameplayStatics::SpawnSoundAtLocation(this, FireSFX, GetActorLocation());
 }
 
 void AMirrorForceBulletSpawner::SpawnBulletWithTimer()
@@ -93,6 +96,7 @@ void AMirrorForceBulletSpawner::SpawnHoveringPattern(int InNumBullets, float Del
 	FTimerDelegate TimerDel;
 	TimerDel.BindUFunction(this, FName("SpawnSingleHoveringBullet"));
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, TimerDel, DelayBetweenBullets, true);
+	UGameplayStatics::SpawnSoundAtLocation(this, FireSFX, GetActorLocation());
 }
 
 void AMirrorForceBulletSpawner::SpawnSingleHoveringBullet()
