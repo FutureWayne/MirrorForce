@@ -40,7 +40,8 @@ struct FLaneSFXInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lane SFX")
 	TObjectPtr<USoundBase> LoseMusic;
 
-	UAudioComponent* themeAudioComponent;
+	UPROPERTY()
+	UAudioComponent* ThemeAudioComponent;
 };
 
 UCLASS()
@@ -84,5 +85,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> SwitchLaneSFX;
 
+	UPROPERTY()
 	UAudioComponent* CurrentAudioComponent;
 };

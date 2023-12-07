@@ -51,11 +51,11 @@ void AMirrorForceLaneController::BeginPlay()
 	{
 		if (LaneSFXs.IsValidIndex(i))
 		{
-			LaneSFXs[i].themeAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, LaneSFXs[i].ThemeMusic, GetActorLocation());
-			LaneSFXs[i].themeAudioComponent->SetPaused(true);
+			LaneSFXs[i].ThemeAudioComponent = UGameplayStatics::SpawnSoundAtLocation(this, LaneSFXs[i].ThemeMusic, GetActorLocation());
+			LaneSFXs[i].ThemeAudioComponent->SetPaused(true);
 			if (!CurrentAudioComponent)
 			{
-				CurrentAudioComponent = LaneSFXs[i].themeAudioComponent;
+				CurrentAudioComponent = LaneSFXs[i].ThemeAudioComponent;
 				CurrentAudioComponent->SetPaused(false);
 			}
 		}
@@ -111,14 +111,7 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 	CurrentLaneIndex = (CurrentLaneIndex + 1) % Lanes.Num();
 
 	// Use the next camera as the new view target
-	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
-	{
-		PlayerController->SetViewTarget(Lanes[CurrentLaneIndex].Camera);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerController is NULL"));
-	}
+	UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->SetViewTarget(Lanes[CurrentLaneIndex].Camera);
 
 	const FVector NewAnchorPointLocation = AnchorPointLocations[CurrentLaneIndex];
 	const FVector DeltaLocation = NewAnchorPointLocation - LastAnchorPointLocation;
@@ -148,8 +141,8 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 	if (LaneSFXs.IsValidIndex(CurrentLaneIndex))
 	{
 		CurrentAudioComponent->SetPaused(true);
-		LaneSFXs[CurrentLaneIndex].themeAudioComponent->SetPaused(false);
-		CurrentAudioComponent = LaneSFXs[CurrentLaneIndex].themeAudioComponent;
+		LaneSFXs[CurrentLaneIndex].ThemeAudioComponent->SetPaused(false);
+		CurrentAudioComponent = LaneSFXs[CurrentLaneIndex].ThemeAudioComponent;
 	}
 	else
 	{
