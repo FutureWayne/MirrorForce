@@ -56,8 +56,16 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Lane Scroller")
 	void ChangeToNextScrollingLane();
-	FLaneSFXInfo GetLaneSFXInfo();
+
+	UFUNCTION(BlueprintCallable, Category = "Lane Scroller")
+	float GetCurrentLaneProgress() const;
+
 	void StopThemeMusic();
+
+	void OnGameEnd();
+	
+	FLaneSFXInfo GetLaneSFXInfo();
+	
 
 protected:
 	virtual void BeginPlay() override;
@@ -77,14 +85,20 @@ protected:
 private:
 	UFUNCTION()
 	void OnTriggerBoxOverlap(AActor* OverlappedActor, AActor* OtherActor);
-	
-	int CurrentLaneIndex = 0;
-
-	TArray<FVector> AnchorPointLocations = {};
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> SwitchLaneSFX;
 
 	UPROPERTY()
 	UAudioComponent* CurrentAudioComponent;
+	
+	int CurrentLaneIndex = 0;
+
+	float LaneLength = 0.0f;
+
+	bool bShouldScroll = true;
+
+	TArray<FVector> AnchorPointLocations = {};
+
+	TArray<float> LaneProgress = {};
 };

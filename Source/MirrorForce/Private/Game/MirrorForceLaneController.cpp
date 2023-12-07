@@ -54,17 +54,31 @@ void AMirrorForceLaneController::BeginPlay()
 			CurrentAudioComponent->SetPaused(false);
 		}
 	}
+
+	// Calculate lane length from anchor point to ending trigger box
+	check(Lanes.IsValidIndex(0))
+	const FVector AnchorPointLocation = AnchorPointLocations[0];
+	const FVector EndingTriggerBoxLocation = Lanes[0].EndingTriggerBox->GetActorLocation();
+	LaneLength = EndingTriggerBoxLocation.X - AnchorPointLocation.X;
+
+	// Init lane progress
+	for	(int i = 0; i < Lanes.Num(); i++)
+	{
+		LaneProgress.Add(0.0f);
+	}
 }
 
 void AMirrorForceLaneController::OnTriggerBoxOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
 	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn())
 	{
-		// TODO: Winning Condition
 		if (LaneSFXs.IsValidIndex(CurrentLaneIndex))
 		{
 			CurrentAudioComponent->SetPaused(true);
 			UGameplayStatics::SpawnSoundAtLocation(this, LaneSFXs[CurrentLaneIndex].VictoryMusic, GetActorLocation());
+			OnGameEnd();
+
+			//TODO: Winning UI
 		}
 	}
 }
@@ -72,6 +86,11 @@ void AMirrorForceLaneController::OnTriggerBoxOverlap(AActor* OverlappedActor, AA
 void AMirrorForceLaneController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!bShouldScroll)
+	{
+		return;
+	}
 	
 	if (Lanes.IsValidIndex(CurrentLaneIndex))
 	{
@@ -80,6 +99,11 @@ void AMirrorForceLaneController::Tick(float DeltaTime)
 			FVector CurrentLaneLocation = CurrentLane->GetActorLocation();
 			CurrentLaneLocation.X += LaneScrollSpeed * DeltaTime;
 			CurrentLane->SetActorLocation(CurrentLaneLocation);
+
+			// Update lane progress
+			LaneProgress[CurrentLaneIndex] = (LaneLength - CurrentLaneLocation.X + AnchorPointLocations[CurrentLaneIndex].X) / LaneLength;
+
+			GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("Lane Progress: %f"), LaneProgress[CurrentLaneIndex]));
 		}
 		else
 		{
@@ -133,6 +157,11 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 	CurrentAudioComponent = LaneSFXs[CurrentLaneIndex].ThemeAudioComponent;
 }
 
+float AMirrorForceLaneController::GetCurrentLaneProgress() const
+{
+	return LaneProgress[CurrentLaneIndex];
+}
+
 FLaneSFXInfo AMirrorForceLaneController::GetLaneSFXInfo()
 {
 	return LaneSFXs[CurrentLaneIndex];
@@ -141,5 +170,10 @@ FLaneSFXInfo AMirrorForceLaneController::GetLaneSFXInfo()
 void AMirrorForceLaneController::StopThemeMusic()
 {
 	CurrentAudioComponent->SetPaused(true);
+}
+
+void AMirrorForceLaneController::OnGameEnd()
+{
+	bShouldScroll = false;
 }
 
