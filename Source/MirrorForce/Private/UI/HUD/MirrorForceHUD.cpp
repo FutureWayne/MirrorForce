@@ -19,7 +19,7 @@ UOverlayWidgetController* AMirrorForceHUD::GetOverlayWidgetController(const FWid
 }
 
 void AMirrorForceHUD::InitOverlay(APlayerController* PlayerController, APlayerState* PlayerState,
-	UAbilitySystemComponent* AbilitySystemComponent, UAttributeSet* AttributeSet)
+	UAbilitySystemComponent* AbilitySystemComponent, UAttributeSet* AttributeSet, AMirrorForceLaneController* MirrorForceLaneController)
 {
 	checkf(OverlayWidgetClass, TEXT("OverlayWidgetClass is not set in MirrorForceHUD"));
 	checkf(OverlayWidgetControllerClass, TEXT("OverlayWidgetControllerClass is not set in MirrorForceHUD"));
@@ -27,7 +27,7 @@ void AMirrorForceHUD::InitOverlay(APlayerController* PlayerController, APlayerSt
 	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), OverlayWidgetClass);
 	OverlayWidget = Cast<UMirrorForceUserWidget>(Widget);
 
-	const FWidgetControllerParams WidgetControllerParams(PlayerController, PlayerState, AbilitySystemComponent, AttributeSet);
+	const FWidgetControllerParams WidgetControllerParams(PlayerController, PlayerState, AbilitySystemComponent, AttributeSet, MirrorForceLaneController);
 	UOverlayWidgetController* WidgetController = GetOverlayWidgetController(WidgetControllerParams);
 	OverlayWidget->SetWidgetController(WidgetController);
 	WidgetController->BroadcastInitialValues();

@@ -9,6 +9,7 @@ void UMirrorForceWidgetController::SetWidgetControllerParams(const FWidgetContro
 	PlayerState = InWCParams.PlayerState;
 	AbilitySystemComponent = InWCParams.AbilitySystemComponent;
 	AttributeSet = InWCParams.AttributeSet;
+	MirrorForceLaneController = InWCParams.MirrorForceLaneController;
 }
 
 void UMirrorForceWidgetController::BroadcastInitialValues()
