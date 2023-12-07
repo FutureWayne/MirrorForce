@@ -10,6 +10,7 @@
 #include "Materials/Material.h"
 #include "Engine/World.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/MirrorAttributeSet.h"
 #include "Player/MirrorForcePlayerState.h"
 #include "UI/HUD/MirrorForceHUD.h"
 
@@ -69,12 +70,27 @@ void AMirrorForceCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(MirrorForcePlayerState, this);
 	AttributeSet = MirrorForcePlayerState->GetAttributeSet();
 
+	// Bind on mana change delegate
+	const UMirrorAttributeSet* MirrorAttributeSet = Cast<UMirrorAttributeSet>(MirrorForcePlayerState->GetAttributeSet());
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MirrorAttributeSet->GetHealthAttribute()).AddUObject(this, &AMirrorForceCharacter::OnHealthChange);
+
+	// Init UI Overlay
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()) )
 	{
 		if ( AMirrorForceHUD* MirrorForceHUD = Cast<AMirrorForceHUD>(PlayerController->GetHUD()) )
 		{
 			MirrorForceHUD->InitOverlay(PlayerController, MirrorForcePlayerState, AbilitySystemComponent, AttributeSet);
 		}
+	}
+}
+
+void AMirrorForceCharacter::OnHealthChange(const FOnAttributeChangeData& OnAttributeChangeData)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Health changed to %f"), OnAttributeChangeData.NewValue));
+	if (OnAttributeChangeData.NewValue <= 0.0f)
+	{
+		// TODO: Losing Condition
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("You died!"));
 	}
 }
 
