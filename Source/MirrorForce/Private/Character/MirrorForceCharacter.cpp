@@ -101,10 +101,6 @@ void AMirrorForceCharacter::OnHealthChange(const FOnAttributeChangeData& OnAttri
 			UGameplayStatics::SpawnSoundAtLocation(this, LoseSFX, GetActorLocation());
 		}
 	}
-	else
-	{
-		UGameplayStatics::SpawnSoundAtLocation(this, GetHitSFX, GetActorLocation());
-	}
 }
 
 void AMirrorForceCharacter::PossessedBy(AController* NewController)

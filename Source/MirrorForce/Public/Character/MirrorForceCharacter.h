@@ -40,8 +40,5 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpringArmComponent> CameraBoom;
 
-	UPROPERTY(EditAnywhere, Category = "Player SFX")
-	TObjectPtr<USoundBase> GetHitSFX;
-
 };
 
