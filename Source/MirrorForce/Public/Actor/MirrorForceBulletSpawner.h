@@ -38,7 +38,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
 	void SpawnMultipleCross(int NumBalls, float InitialSpeed, float BurstSpeed, float Delay, float SpawnDelay);
-	
+
+	UFUNCTION()
+	void GenerateCrossBullet(AMirrorForceProjectile* Bullet, int i, float BurstSpeed);
+
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
 	void SpawnCrossPattern(float InitialSpeed, float BurstSpeed, float Delay);
 
