@@ -142,3 +142,36 @@ void AMirrorForceBulletSpawner::FireHoveringBullet()
 		GetWorld()->GetTimerManager().ClearTimer(FireTimerHandle);
 	}
 }
+
+void AMirrorForceBulletSpawner::SpawnFanPattern(int InNumLines, int InNumBulletsPerLine, float InRotateSpeed)
+{
+	this->RotateSpeed = InRotateSpeed;
+	FTimerHandle RotationTimerHandle;
+	const float AngleBetweenLines = 2 * PI / InNumLines;
+	for (int i = 0; i < InNumLines; i++)
+	{
+		const float LineAngle = i * AngleBetweenLines;
+		for (int j = 0; j < InNumBulletsPerLine; j++)
+		{
+			const float Distance = j * 100; // Change this value to control the distance between bullets in a line
+			SpawnBulletAtDistance(LineAngle, Distance);
+		}
+	}
+	GetWorld()->GetTimerManager().SetTimer(RotationTimerHandle, this, &AMirrorForceBulletSpawner::StartRotate, 0.01f, true);
+}
+void AMirrorForceBulletSpawner::SpawnBulletAtDistance(float Angle, float Distance)
+{
+	const FVector StartLocation = GetActorLocation() + Distance * FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.f);
+	if (AMirrorForceProjectile* Bullet = Cast<AMirrorForceProjectile>(BulletPool->SpawnPooledActor()))
+	{
+		Bullet->SetActorLocation(StartLocation);
+		Bullet->ProjectileMovement->Velocity = FVector::ZeroVector;
+		Bullet->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+	}
+}
+void AMirrorForceBulletSpawner::StartRotate()
+{
+	FRotator NewRotation = GetActorRotation();
+	NewRotation.Yaw += RotateSpeed;
+	SetActorRotation(NewRotation);
+}

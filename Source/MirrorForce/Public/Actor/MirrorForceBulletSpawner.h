@@ -33,8 +33,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
 	void SpawnHoveringPattern(int InNumBullets, float DelayBetweenBullets,float InBulletSpeed, AActor* InPlayer);
 
+	UFUNCTION(BlueprintCallable, Category = "Bullet Pattern")
+	void SpawnFanPattern(int InNumLines, int InNumBulletsPerLine, float InRotateSpeed);
+
+	UFUNCTION()
+	void SpawnBulletAtDistance(float Angle, float Distance);
+
 	UFUNCTION()
 	void SpawnBulletWithTimer();
+
+	UFUNCTION()
+	void StartRotate();
 
 	UFUNCTION()
 	void FireHoveringBullet();
@@ -51,6 +60,7 @@ private:
 	int NumBullets;
 	float AngleIncrement;
 	float BulletSpeed;
+	float RotateSpeed;
 	
 	TArray<AMirrorForceProjectile*> HoveringBullets;
 	AActor* Player; 
