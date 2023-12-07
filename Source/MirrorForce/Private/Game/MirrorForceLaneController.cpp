@@ -157,8 +157,13 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 	}
 }
 
-const FLaneSFXInfo AMirrorForceLaneController::GetLaneSFXInfo()
+FLaneSFXInfo AMirrorForceLaneController::GetLaneSFXInfo()
 {
 	return LaneSFXs[CurrentLaneIndex];
+}
+
+void AMirrorForceLaneController::StopThemeMusic()
+{
+	CurrentAudioComponent->SetPaused(true);
 }
 

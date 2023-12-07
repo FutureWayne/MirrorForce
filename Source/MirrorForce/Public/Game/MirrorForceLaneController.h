@@ -55,7 +55,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Lane Scroller")
 	void ChangeToNextScrollingLane();
-	const FLaneSFXInfo GetLaneSFXInfo();
+	FLaneSFXInfo GetLaneSFXInfo();
+	void StopThemeMusic();
 
 protected:
 	virtual void BeginPlay() override;
