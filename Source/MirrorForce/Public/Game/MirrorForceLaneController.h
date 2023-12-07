@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "MirrorForceLaneController.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnGameWinSignature);
+DECLARE_MULTICAST_DELEGATE(FOnGameLoseSignature);
+
 class ATriggerBox;
 
 USTRUCT(BlueprintType)
@@ -62,10 +65,12 @@ public:
 
 	void StopThemeMusic();
 
-	void OnGameEnd();
+	void OnPlayerDead();
 	
 	FLaneSFXInfo GetLaneSFXInfo();
-	
+
+	FOnGameWinSignature OnGameWin;
+	FOnGameLoseSignature OnGameLose;
 
 protected:
 	virtual void BeginPlay() override;

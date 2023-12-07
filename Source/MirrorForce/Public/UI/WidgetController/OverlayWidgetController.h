@@ -11,6 +11,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChangedSignature, float,
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnManaChangedSignature, float, NewMana);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxManaChangedSignature, float, NewMaxMana);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWinSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoseSignature);
+
 /**
  * 
  */
@@ -31,6 +34,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
 	FOnMaxManaChangedSignature OnMaxManaChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
+	FOnWinSignature OnWin;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
+	FOnLoseSignature OnLose;
 
 	virtual void BroadcastInitialValues() override;
 

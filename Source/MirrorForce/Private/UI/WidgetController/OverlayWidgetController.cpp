@@ -46,4 +46,18 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			OnMaxManaChanged.Broadcast(Data.NewValue);
 		}
 	);
+
+	MirrorForceLaneController->OnGameWin.AddLambda(
+		[this]()
+		{
+			OnWin.Broadcast();
+		}
+	);
+
+	MirrorForceLaneController->OnGameLose.AddLambda(
+		[this]()
+		{
+			OnLose.Broadcast();
+		}
+	);
 }

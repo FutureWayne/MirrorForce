@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Game/MirrorForceLaneController.h"
 #include "GameFramework/HUD.h"
 #include "MirrorForceHUD.generated.h"
 
@@ -25,7 +26,8 @@ public:
 
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& Params);
 
-	void InitOverlay(APlayerController* PlayerController, APlayerState* PlayerState, UAbilitySystemComponent* AbilitySystemComponent, UAttributeSet* AttributeSet);
+	void InitOverlay(APlayerController* PlayerController, APlayerState* PlayerState, UAbilitySystemComponent* AbilitySystemComponent, UAttributeSet
+	                 * AttributeSet, AMirrorForceLaneController* MirrorForceLaneController);
 
 private:
 	UPROPERTY(EditAnywhere, Category = "MirrorForceHUD")

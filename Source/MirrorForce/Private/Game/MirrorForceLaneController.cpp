@@ -76,9 +76,10 @@ void AMirrorForceLaneController::OnTriggerBoxOverlap(AActor* OverlappedActor, AA
 		{
 			CurrentAudioComponent->SetPaused(true);
 			UGameplayStatics::SpawnSoundAtLocation(this, LaneSFXs[CurrentLaneIndex].VictoryMusic, GetActorLocation());
-			OnGameEnd();
+			bShouldScroll = false;
 
 			//TODO: Winning UI
+			OnGameWin.Broadcast();
 		}
 	}
 }
@@ -172,8 +173,10 @@ void AMirrorForceLaneController::StopThemeMusic()
 	CurrentAudioComponent->SetPaused(true);
 }
 
-void AMirrorForceLaneController::OnGameEnd()
+void AMirrorForceLaneController::OnPlayerDead()
 {
 	bShouldScroll = false;
+
+	OnGameLose.Broadcast();
 }
 

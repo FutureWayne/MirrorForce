@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Game/MirrorForceLaneController.h"
 #include "MirrorForceWidgetController.generated.h"
 
 class UAttributeSet;
@@ -14,11 +15,12 @@ struct FWidgetControllerParams
 	GENERATED_BODY()
 
 	FWidgetControllerParams() {}
-	FWidgetControllerParams(APlayerController* InPlayerController, APlayerState* InPlayerState, UAbilitySystemComponent* InAbilitySystemComponent, UAttributeSet* InAttributeSet)
+	FWidgetControllerParams(APlayerController* InPlayerController, APlayerState* InPlayerState, UAbilitySystemComponent* InAbilitySystemComponent, UAttributeSet* InAttributeSet, AMirrorForceLaneController* InMirrorForceLaneController)
 		: PlayerController(InPlayerController)
 		, PlayerState(InPlayerState)
 		, AbilitySystemComponent(InAbilitySystemComponent)
-		, AttributeSet(InAttributeSet) {}
+		, AttributeSet(InAttributeSet)
+		, MirrorForceLaneController(InMirrorForceLaneController) {}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetControllerParams")
 	TObjectPtr<APlayerController> PlayerController = nullptr;
@@ -31,6 +33,9 @@ struct FWidgetControllerParams
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetControllerParams")
 	TObjectPtr<UAttributeSet> AttributeSet = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WidgetControllerParams")
+	TObjectPtr<AMirrorForceLaneController> MirrorForceLaneController = nullptr;
 };
 
 /**
@@ -61,4 +66,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "MirrorForceWidgetController")
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	UPROPERTY(BlueprintReadOnly, Category = "MirrorForceWidgetController")
+	TObjectPtr<AMirrorForceLaneController> MirrorForceLaneController;
 };

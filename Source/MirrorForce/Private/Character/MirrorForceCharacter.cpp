@@ -74,12 +74,15 @@ void AMirrorForceCharacter::InitAbilityActorInfo()
 	const UMirrorAttributeSet* MirrorAttributeSet = Cast<UMirrorAttributeSet>(MirrorForcePlayerState->GetAttributeSet());
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MirrorAttributeSet->GetHealthAttribute()).AddUObject(this, &AMirrorForceCharacter::OnHealthChange);
 
+	// Get LaneController
+	AMirrorForceLaneController* LaneController = Cast<AMirrorForceLaneController>(UGameplayStatics::GetActorOfClass(GetWorld(), AMirrorForceLaneController::StaticClass()));
+	
 	// Init UI Overlay
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()) )
 	{
 		if ( AMirrorForceHUD* MirrorForceHUD = Cast<AMirrorForceHUD>(PlayerController->GetHUD()) )
 		{
-			MirrorForceHUD->InitOverlay(PlayerController, MirrorForcePlayerState, AbilitySystemComponent, AttributeSet);
+			MirrorForceHUD->InitOverlay(PlayerController, MirrorForcePlayerState, AbilitySystemComponent, AttributeSet, LaneController);
 		}
 	}
 }
@@ -94,7 +97,7 @@ void AMirrorForceCharacter::OnPlayerDead()
 	if (const AMirrorForceGameModeBase* GameMode = Cast<AMirrorForceGameModeBase>(GetWorld()->GetAuthGameMode()))
 	{
 		AMirrorForceLaneController* LaneController = GameMode->LaneController;
-		LaneController->OnGameEnd();
+		LaneController->OnPlayerDead();
 		
 		LaneController->StopThemeMusic();
 		const TObjectPtr<USoundBase> LoseSFX = LaneController->GetLaneSFXInfo().LoseMusic;
