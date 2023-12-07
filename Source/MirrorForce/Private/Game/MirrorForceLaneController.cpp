@@ -52,6 +52,7 @@ void AMirrorForceLaneController::BeginPlay()
 		{
 			CurrentAudioComponent = LaneSFXs[i].ThemeAudioComponent;
 			CurrentAudioComponent->SetPaused(false);
+			CurrentAudioComponent->bIsUISound = true;
 		}
 	}
 
@@ -74,12 +75,14 @@ void AMirrorForceLaneController::OnTriggerBoxOverlap(AActor* OverlappedActor, AA
 	{
 		if (LaneSFXs.IsValidIndex(CurrentLaneIndex))
 		{
-			CurrentAudioComponent->SetPaused(true);
-			UGameplayStatics::SpawnSoundAtLocation(this, LaneSFXs[CurrentLaneIndex].VictoryMusic, GetActorLocation());
+			CurrentAudioComponent->SetSound(LaneSFXs[CurrentLaneIndex].VictoryMusic);
 			bShouldScroll = false;
 
 			//TODO: Winning UI
 			OnGameWin.Broadcast();
+
+			// pause the game
+			UGameplayStatics::SetGamePaused(GetWorld(), true);
 		}
 	}
 }
@@ -103,8 +106,6 @@ void AMirrorForceLaneController::Tick(float DeltaTime)
 
 			// Update lane progress
 			LaneProgress[CurrentLaneIndex] = (LaneLength - CurrentLaneLocation.X + AnchorPointLocations[CurrentLaneIndex].X) / LaneLength;
-
-			GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("Lane Progress: %f"), LaneProgress[CurrentLaneIndex]));
 		}
 		else
 		{
@@ -156,6 +157,7 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 	CurrentAudioComponent->SetPaused(true);
 	LaneSFXs[CurrentLaneIndex].ThemeAudioComponent->SetPaused(false);
 	CurrentAudioComponent = LaneSFXs[CurrentLaneIndex].ThemeAudioComponent;
+	CurrentAudioComponent->bIsUISound = true;
 }
 
 float AMirrorForceLaneController::GetCurrentLaneProgress() const
