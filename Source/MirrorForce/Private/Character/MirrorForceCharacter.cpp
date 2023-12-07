@@ -2,7 +2,6 @@
 
 #include "Character/MirrorForceCharacter.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -10,12 +9,15 @@
 #include "Materials/Material.h"
 #include "Engine/World.h"
 #include "AbilitySystemComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/MirrorAttributeSet.h"
 #include "Player/MirrorForcePlayerState.h"
 #include "UI/HUD/MirrorForceHUD.h"
 #include <Kismet/GameplayStatics.h>
 #include <Game/MirrorForceLaneController.h>
 #include <Game/MirrorForceGameModeBase.h>
+
+#include "NiagaraComponent.h"
 
 AMirrorForceCharacter::AMirrorForceCharacter()
 {
@@ -50,11 +52,6 @@ AMirrorForceCharacter::AMirrorForceCharacter()
 	CameraBoom->TargetArmLength = 800.f;
 	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
-
-	// Create a camera...
-	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
-	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 	
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -87,21 +84,63 @@ void AMirrorForceCharacter::InitAbilityActorInfo()
 	}
 }
 
+void AMirrorForceCharacter::OnPlayerDead()
+{
+	if (bIsDead)
+	{
+		return;
+	}
+	
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("You died!"));
+	if (const AMirrorForceGameModeBase* GameMode = Cast<AMirrorForceGameModeBase>(GetWorld()->GetAuthGameMode()))
+	{
+		AMirrorForceLaneController* LaneController = GameMode->LaneController;;
+		LaneController->StopThemeMusic();
+		const TObjectPtr<USoundBase> LoseSFX = LaneController->GetLaneSFXInfo().LoseMusic;
+		UGameplayStatics::SpawnSoundAtLocation(this, LoseSFX, GetActorLocation());
+	}
+
+	if (UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		DeathEffect,
+		GetActorLocation(),
+		GetActorRotation()
+	))
+	{
+		NiagaraComponent->SetAutoDestroy(true);
+	}
+
+	// Disable input
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		PlayerController->DisableInput(PlayerController);
+	}
+
+	// Hide skeletal mesh
+	GetMesh()->SetVisibility(false, true);
+
+	// Disable capsule collision
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// TODO: Show a countdown timer to restart the level
+	FTimerHandle DeathTimer;
+	FTimerDelegate DeathTimerDelegate;
+	DeathTimerDelegate.BindLambda([this]()
+	{
+		// Restart the level
+		UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+	});
+	GetWorldTimerManager().SetTimer(DeathTimer, DeathTimerDelegate, 5.0f, false);
+
+	bIsDead = true;
+}
+
 void AMirrorForceCharacter::OnHealthChange(const FOnAttributeChangeData& OnAttributeChangeData)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Health changed to %f"), OnAttributeChangeData.NewValue));
 	if (OnAttributeChangeData.NewValue <= 0.0f)
 	{
-		// TODO: Losing Condition
-		// Should change scene after lose sfx played
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("You died!"));
-		if (const AMirrorForceGameModeBase* GameMode = Cast<AMirrorForceGameModeBase>(GetWorld()->GetAuthGameMode()))
-		{
-			AMirrorForceLaneController* LaneController = GameMode->LaneController;;
-			LaneController->StopThemeMusic();
-			TObjectPtr<USoundBase> LoseSFX = LaneController->GetLaneSFXInfo().LoseMusic;
-			UGameplayStatics::SpawnSoundAtLocation(this, LoseSFX, GetActorLocation());
-		}
+		OnPlayerDead();
 	}
 }
 
