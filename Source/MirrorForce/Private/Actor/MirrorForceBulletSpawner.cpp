@@ -14,19 +14,40 @@ AMirrorForceBulletSpawner::AMirrorForceBulletSpawner()
 	BulletPool = CreateDefaultSubobject<UMirrorForceActorPool>(TEXT("Bullet Pool"));
 } 
 
-
-//CIRCLE
-void AMirrorForceBulletSpawner::SpawnCirclePattern(int InNumBullets, float AngleBetweenBullets, float InBulletSpeed)
+void AMirrorForceBulletSpawner::BeginPlay()
 {
-	for (int i = 0; i < InNumBullets; i++)
-	{
-		const float Angle = i * AngleBetweenBullets;
-		SpawnBullet(Angle, InBulletSpeed);
-	}
-	UGameplayStatics::SpawnSoundAtLocation(this, FireSFX, GetActorLocation());
+	Super::BeginPlay();
+	Player = UGameplayStatics::GetPlayerPawn(this, 0);
 }
 
-void AMirrorForceBulletSpawner::SpawnMultipleCircles(int InNumBullets, float AngleBetweenBullets, float InBulletSpeed, int NumSpirals, float DelayBetweenSpirals)
+//CIRCLE
+void AMirrorForceBulletSpawner::SpawnCirclePattern(float MaxAngle, float AngleBetweenBullets, float InBulletSpeed, const FVector& Offset)
+{
+	//FVector PlayerDirection = Player->GetActorLocation() - GetActorLocation();
+	//PlayerDirection.Normalize();
+	//float StartAngle = FMath::Atan2(PlayerDirection.Y, PlayerDirection.X) -(MaxAngle / 2.0f * PI / 180.0f);;
+
+	FVector FixedDirection = FVector(1, 0, 0);
+	FixedDirection.Normalize();
+	float StartAngle = FMath::Atan2(FixedDirection.Y, FixedDirection.X) - (MaxAngle / 2.0f * PI / 180.0f);
+
+	int InNumBullets = FMath::RoundToInt(MaxAngle / AngleBetweenBullets);
+	for (int i = 0; i < InNumBullets; i++)
+	{
+		const float Angle = StartAngle + i * AngleBetweenBullets * PI / 180.0f;
+		const FVector StartLocation = GetActorLocation() + Offset;
+		if (AMirrorForceProjectile* Bullet = Cast<AMirrorForceProjectile>(BulletPool->SpawnPooledActor()); Bullet != nullptr)
+		{
+			Bullet->SetActorLocation(StartLocation);
+			const FVector Direction = FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.f);
+			Bullet->ProjectileMovement->Velocity = Direction * InBulletSpeed;
+		}
+	}
+	UGameplayStatics::SpawnSoundAtLocation(this, FireSFX, GetActorLocation() + Offset);
+}
+
+
+void AMirrorForceBulletSpawner::SpawnMultipleCircles(float MaxAngle, float AngleBetweenBullets, float InBulletSpeed, int NumSpirals, float DelayBetweenSpirals, const FVector& Offset)
 {
 	for (int i = 0; i <= NumSpirals; i++)
 	{
@@ -34,16 +55,15 @@ void AMirrorForceBulletSpawner::SpawnMultipleCircles(int InNumBullets, float Ang
 		{
 			FTimerHandle TimerHandle;
 			FTimerDelegate TimerDel;
-			TimerDel.BindUFunction(this, FName("SpawnCirclePattern"), InNumBullets, AngleBetweenBullets, InBulletSpeed);
+			TimerDel.BindUFunction(this, FName("SpawnCirclePattern"), MaxAngle, AngleBetweenBullets, InBulletSpeed, Offset);
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, i * DelayBetweenSpirals, false);
 		}
 		else
 		{
-			SpawnCirclePattern(InNumBullets, AngleBetweenBullets, InBulletSpeed);
+			SpawnCirclePattern(MaxAngle, AngleBetweenBullets, InBulletSpeed, Offset);
 		}
 	}
 }
-
 
 //SPIRAL
 void AMirrorForceBulletSpawner::SpawnSpiralPattern(int InNumBullets, float InAngleIncrement, float InBulletSpeed, float DelayBetweenBullets)
@@ -86,11 +106,10 @@ void AMirrorForceBulletSpawner::SpawnBullet(float Angle, float InBulletSpeed) co
 }
 
 //HOMING
-void AMirrorForceBulletSpawner::SpawnHoveringPattern(int InNumBullets, float DelayBetweenBullets, float InBulletSpeed, AActor* InPlayer)
+void AMirrorForceBulletSpawner::SpawnHoveringPattern(int InNumBullets, float DelayBetweenBullets, float InBulletSpeed)
 {
 	this->NumBullets = InNumBullets;
 	this->CurrentBullet = 0;
-	this->Player = InPlayer;
 	this->BulletSpeed = InBulletSpeed;
 
 	FTimerDelegate TimerDel;
@@ -145,20 +164,43 @@ void AMirrorForceBulletSpawner::FireHoveringBullet()
 
 void AMirrorForceBulletSpawner::SpawnFanPattern(int InNumLines, int InNumBulletsPerLine, float InRotateSpeed)
 {
+	this->NumLines = InNumLines;
+	this->NumBulletsPerLine = InNumBulletsPerLine;
+	this->CurrentLine = 0;
+	this->CurrentBullet = 0;
 	this->RotateSpeed = InRotateSpeed;
-	FTimerHandle RotationTimerHandle;
 	const float AngleBetweenLines = 2 * PI / InNumLines;
-	for (int i = 0; i < InNumLines; i++)
+	const float TotalLineLength = 2500; // Change this value to control the total length of the line
+
+	FTimerDelegate TimerDel;
+	TimerDel.BindUFunction(this, FName("SpawnSingleBulletInLine"));
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, TimerDel, 0.2f, true);
+}
+
+void AMirrorForceBulletSpawner::SpawnSingleBulletInLine()
+{
+	if (CurrentLine < NumLines)
 	{
-		const float LineAngle = i * AngleBetweenLines;
-		for (int j = 0; j < InNumBulletsPerLine; j++)
+		const float LineAngle = CurrentLine * (2 * PI / NumLines);
+		if (CurrentBullet < NumBulletsPerLine)
 		{
-			const float Distance = j * 100; // Change this value to control the distance between bullets in a line
+			const float Distance = CurrentBullet * (2500 / NumBulletsPerLine);
 			SpawnBulletAtDistance(LineAngle, Distance);
+			CurrentBullet++;
+		}
+		else
+		{
+			CurrentBullet = 0;
+			CurrentLine++;
 		}
 	}
-	GetWorld()->GetTimerManager().SetTimer(RotationTimerHandle, this, &AMirrorForceBulletSpawner::StartRotate, 0.01f, true);
+	else
+	{
+		GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
+		GetWorld()->GetTimerManager().SetTimer(RotationTimerHandle, this, &AMirrorForceBulletSpawner::StartRotate, 0.01f, true);
+	}
 }
+
 void AMirrorForceBulletSpawner::SpawnBulletAtDistance(float Angle, float Distance)
 {
 	const FVector StartLocation = GetActorLocation() + Distance * FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.f);
@@ -175,3 +217,46 @@ void AMirrorForceBulletSpawner::StartRotate()
 	NewRotation.Yaw += RotateSpeed;
 	SetActorRotation(NewRotation);
 }
+
+void AMirrorForceBulletSpawner::SpawnCrossPattern(float InitialSpeed, float BurstSpeed, float Delay)
+{
+	FVector StartLocation = GetActorLocation();
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (AMirrorForceProjectile* Bullet = Cast<AMirrorForceProjectile>(BulletPool->SpawnPooledActor()); Bullet != nullptr)
+		{
+			Bullet->SetActorLocation(StartLocation);
+			Bullet->ProjectileMovement->Velocity = FVector(1, 0, 0) * InitialSpeed;
+
+			FTimerHandle TimerHandle;
+			FTimerDelegate TimerDel;
+			TimerDel.BindLambda([Bullet, i, BurstSpeed]()
+				{
+					FVector Direction;
+					switch (i)
+					{
+					case 0: Direction = FVector(FMath::Sqrt(2.0f) / 2, FMath::Sqrt(2.0f) / 2, 0); break; 
+					case 1: Direction = FVector(-FMath::Sqrt(2.0f) / 2, FMath::Sqrt(2.0f) / 2, 0); break; 
+					case 2: Direction = FVector(-FMath::Sqrt(2.0f) / 2, -FMath::Sqrt(2.0f) / 2, 0); break; 
+					case 3: Direction = FVector(FMath::Sqrt(2.0f) / 2, -FMath::Sqrt(2.0f) / 2, 0); break;
+					}
+					Bullet->ProjectileMovement->Velocity = Direction * BurstSpeed;
+				});
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, Delay, false);
+		}
+	}
+	UGameplayStatics::SpawnSoundAtLocation(this, FireSFX, GetActorLocation());
+}
+
+void AMirrorForceBulletSpawner::SpawnMultipleCross(int NumBalls, float InitialSpeed, float BurstSpeed, float Delay, float SpawnDelay)
+{
+	for (int j = 0; j < NumBalls; j++)
+	{
+		FTimerHandle TimerHandle;
+		FTimerDelegate TimerDel;
+		TimerDel.BindUFunction(this, FName("SpawnCrossPattern"), InitialSpeed, BurstSpeed, Delay);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, j * SpawnDelay, false);
+	}
+}
+
