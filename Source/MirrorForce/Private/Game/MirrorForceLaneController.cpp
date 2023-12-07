@@ -157,3 +157,8 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 	}
 }
 
+const FLaneSFXInfo AMirrorForceLaneController::GetLaneSFXInfo()
+{
+	return LaneSFXs[CurrentLaneIndex];
+}
+
