@@ -2,7 +2,8 @@
 
 
 #include "Game/MirrorForceLaneController.h"
-
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "Camera/CameraActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
@@ -135,7 +136,16 @@ void AMirrorForceLaneController::ChangeToNextScrollingLane()
 	if (AActor* Player = GetWorld()->GetFirstPlayerController()->GetPawn())
 	{
 		Player->SetActorLocation(Player->GetActorLocation() + DeltaLocation);
-	}
+		if (UNiagaraComponent* NiagaraComponent = Player->FindComponentByClass<UNiagaraComponent>())
+		{
+			// Activate the Niagara system
+			NiagaraComponent->Activate();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("NiagaraComponent not found"));
+		}
+    }
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Player is NULL"));
