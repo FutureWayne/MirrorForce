@@ -126,16 +126,6 @@ void AMirrorForceCharacter::OnPlayerDead()
 	// Disable capsule collision
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	// TODO: Show a countdown timer to restart the level
-	FTimerHandle DeathTimer;
-	FTimerDelegate DeathTimerDelegate;
-	DeathTimerDelegate.BindLambda([this]()
-	{
-		// Restart the level
-		UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
-	});
-	GetWorldTimerManager().SetTimer(DeathTimer, DeathTimerDelegate, 5.0f, false);
-
 	bIsDead = true;
 }
 
